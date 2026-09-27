@@ -7,10 +7,13 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { Lifecycle } from "@/components/home/Lifecycle";
 import { UseCaseMarquee } from "@/components/home/UseCaseMarquee";
 import { Pricing } from "@/components/home/Pricing";
+import { connection } from "next/server";
 import { randomCode } from "@/lib/ids";
 import { currentOrigin } from "@/lib/server/request";
 
 export default async function HomePage() {
+  // Kérésenként renderelünk: mindenki saját, friss kódot lát az előnézetben (ne a buildkor sorsoltat).
+  await connection();
   const origin = await currentOrigin();
   return (
     <>

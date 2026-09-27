@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { QrCode } from "@/components/qr/QrCode";
 import { IconArrowRight, IconPlus, IconScan } from "@/components/ui/Icons";
@@ -34,10 +33,9 @@ async function load(): Promise<{ codes: CodeView[]; now: number }> {
   return { codes: res.codes.sort((a, b) => order.get(a.token)! - order.get(b.token)!), now: res.now };
 }
 
-export function MyCodes({ origin }: { origin: string }) {
+export function MyCodes({ origin, deleted }: { origin: string; deleted: boolean }) {
   const [state, setState] = useState<State>({ loading: true });
   const [version, setVersion] = useState(0);
-  const deleted = useSearchParams().get("torolve") === "1";
 
   useEffect(() => onLocalCodesChange(() => setVersion((v) => v + 1)), []);
 

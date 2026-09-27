@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function MyCodesPage() {
-  return <MyCodes origin={await currentOrigin()} />;
+export default async function MyCodesPage({ searchParams }: PageProps<"/kodjaim">) {
+  const { torolve } = await searchParams;
+  return <MyCodes origin={await currentOrigin()} deleted={torolve === "1"} />;
 }
