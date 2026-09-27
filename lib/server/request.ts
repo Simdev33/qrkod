@@ -1,10 +1,12 @@
 import "server-only";
 import { headers } from "next/headers";
+import { configuredOrigin } from "@/lib/site";
 
-// A QR-kódba írt rövid link alapcíme. Élesben a NEXT_PUBLIC_SITE_URL dönt (a kinyomtatott kódok ehhez
-// kötődnek!), fejlesztéskor a kérés hosztja — így a helyi hálón telefonnal is beolvasható.
+// A QR-kódba írt rövid link alapcíme. Vercelen mindig a projekt éles domainje (így egy előnézeti
+// deployon készült kód is az éles címre mutat), helyben a kérés hosztja — így a helyi hálón
+// telefonnal is beolvasható.
 
-const fromEnv = () => process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "") || "";
+const fromEnv = configuredOrigin;
 
 function fromHeaders(h: Headers) {
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3244";

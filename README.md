@@ -19,13 +19,13 @@ demó fizetőoldal és „időutazás” gombok vannak a kezelőoldalon.
 
 1. **Turso:** hozz létre egy adatbázist (európai régióban), és készíts hozzá tokent.
 2. **Vercel → Settings → Environment Variables:** töltsd ki a [.env.example](.env.example) változóit
-   (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `NEXT_PUBLIC_SITE_URL`, `STRIPE_SECRET_KEY`,
-   `STRIPE_WEBHOOK_SECRET`, `CREATOR_SALT`).
+   (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `CREATOR_SALT`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`).
 3. **Vercel → Settings → Functions → Region:** az adatbázishoz legközelebbi régió. A jelenlegi Turso-adatbázis
    `aws-eu-west-1` (Írország), ehhez a Vercel `dub1` (Dublin) régiója illik.
 4. **Stripe → Webhooks:** végpont `https://<domain>/api/stripe/webhook`, az `.env.example`-ben felsorolt
    eseményekkel; a signing secret megy a `STRIPE_WEBHOOK_SECRET`-be.
 5. Deploy. A táblák az első kéréskor maguktól létrejönnek.
 
-A `NEXT_PUBLIC_SITE_URL`-t a végleges domainre állítsd, mielőtt bárki kinyomtatna egy kódot – a QR-kódok ezt
-a címet tartalmazzák.
+A QR-kódokba a projekt éles domainje kerül (`VERCEL_PROJECT_PRODUCTION_URL`, a Vercel magától adja): saját
+domain esetén az, különben a `*.vercel.app` cím. Ha később saját domaint kötsz be, az új kódok azt kapják, a régiek
+a `vercel.app` címen működnek tovább – ezt a címet ezért ne vedd le a projektről.
