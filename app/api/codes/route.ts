@@ -1,15 +1,14 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { sanitizeDesign } from "@/lib/design";
-import { cleanTitle, createCode, createdRecently, creatorKey } from "@/lib/server/codes";
+import { HOURLY_CREATE_LIMIT } from "@/lib/legal";
+import { cleanTitle, createCode, createdRecently, creatorKey, purgeExpired } from "@/lib/server/codes";
 import { clientIp, originOf } from "@/lib/server/request";
 import { readJson, validTarget } from "@/lib/server/validate";
 
-const HOURLY_LIMIT = 20;
-
 export async function POST(req: Request) {
   const creator = creatorKey(clientIp(req));
-  if ((await createdRecently(creator, 60 * 60 * 1000)) >= HOURLY_LIMIT) {
-    return NextResponse.json({ error: "Túl sok kód készült rövid idő alatt. Próbáld újra egy óra múlva." }, { status: 429 });
+  if ((await createdRecently(creator, 60 * 60 * 1000)) >= HOURLY_CREATE_LIMIT) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
   const body = await readJson(req);
   const target = validTarget(body.target, originOf(req));
@@ -22,5 +21,7 @@ export async function POST(req: Request) {
     proposedId: typeof body.proposedId === "string" ? body.proposedId : undefined,
     creator,
   });
+  // A régóta szünetelő kódok törlése (az Adatkezelési tájékoztatóban vállalt megőrzési idő után).
+  after(() => purgeExpired());
   return NextResponse.json({ id: row.id, token: row.token }, { status: 201 });
 }

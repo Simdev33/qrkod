@@ -5,7 +5,7 @@ import type { Design } from "@/lib/design";
 import { QrCode } from "./QrCode";
 
 /** Szürkére halványuló, „alvó” QR-kód a szünetelő kódok oldalán. */
-export function SleepingQr({ text, design }: { text: string; design: Design }) {
+export function SleepingQr({ text, design, label }: { text: string; design: Design; label: string }) {
   return (
     <div className="relative mx-auto w-44">
       <motion.div
@@ -14,7 +14,7 @@ export function SleepingQr({ text, design }: { text: string; design: Design }) {
         transition={{ duration: 1.6, delay: 0.9, ease: "easeInOut" }}
         className="overflow-hidden rounded-3xl ring-1 ring-ink/10"
       >
-        <QrCode text={text} design={design} className="block h-auto w-full" label="Szünetelő QR-kód" />
+        <QrCode text={text} design={design} className="block h-auto w-full" label={label} />
       </motion.div>
       {["z", "z", "Z"].map((z, i) => (
         <motion.span

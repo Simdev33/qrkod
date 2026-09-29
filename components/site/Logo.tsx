@@ -22,9 +22,9 @@ export function LogoMark({ className = "size-9" }: { className?: string }) {
   );
 }
 
-export function Logo() {
+export function Logo({ href, label }: { href: string; label: string }) {
   return (
-    <Link href="/" className="group flex items-center gap-2.5" aria-label={`${brand.name} – főoldal`}>
+    <Link href={href} className="group flex items-center gap-2.5" aria-label={label}>
       <LogoMark />
       <span className="display text-[19px] leading-none">{brand.name}</span>
     </Link>

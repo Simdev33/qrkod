@@ -15,43 +15,40 @@ import {
 import { processLogo } from "@/lib/logo";
 import { dotPath, eyePaths } from "@/lib/qr/geometry";
 import { IconAlert, IconTrash, IconUpload } from "@/components/ui/Icons";
+import { useI18n } from "@/lib/i18n/client";
 
 type Tab = "pattern" | "colors" | "logo" | "frame";
-const TABS: { id: Tab; label: string }[] = [
-  { id: "pattern", label: "Minta" },
-  { id: "colors", label: "Színek" },
-  { id: "logo", label: "Logó" },
-  { id: "frame", label: "Keret" },
-];
+const TABS: Tab[] = ["pattern", "colors", "logo", "frame"];
 
 export function DesignControls({ design, onChange }: { design: Design; onChange: (d: Design) => void }) {
+  const { t } = useI18n();
   const [tab, setTab] = useState<Tab>("pattern");
   const uid = useId();
   const set = (patch: Partial<Design>) => onChange({ ...design, ...patch });
 
   return (
     <div>
-      <div role="tablist" aria-label="Megjelenés" className="relative grid grid-cols-4 rounded-2xl bg-paper-2/80 p-1">
-        {TABS.map((t) => (
+      <div role="tablist" aria-label={t.design.tablist} className="relative grid grid-cols-4 rounded-2xl bg-paper-2/80 p-1">
+        {TABS.map((id) => (
           <button
-            key={t.id}
+            key={id}
             role="tab"
             type="button"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
+            aria-selected={tab === id}
+            onClick={() => setTab(id)}
             className={`relative z-10 rounded-xl py-2.5 text-sm font-semibold transition-colors ${
-              tab === t.id ? "text-ink" : "text-muted hover:text-ink"
+              tab === id ? "text-ink" : "text-muted hover:text-ink"
             }`}
           >
-            {tab === t.id && (
+            {tab === id && (
               <motion.span
                 layoutId={`tab-${uid}`}
                 className="absolute inset-0 -z-10 rounded-xl bg-white shadow-[0_1px_0_rgb(22_22_29/0.06),0_4px_12px_-6px_rgb(22_22_29/0.3)]"
                 transition={{ type: "spring", stiffness: 520, damping: 38 }}
               />
             )}
-            {t.label}
-            {t.id === "logo" && design.logo && <span className="ml-1.5 inline-block size-1.5 rounded-full bg-kobalt align-middle" />}
+            {t.design.tabs[id]}
+            {id === "logo" && design.logo && <span className="ml-1.5 inline-block size-1.5 rounded-full bg-kobalt align-middle" />}
           </button>
         ))}
       </div>
@@ -136,22 +133,23 @@ function EyeSample({ style }: { style: EyeStyle }) {
 }
 
 function PatternTab({ design, set }: TabProps) {
+  const { t } = useI18n();
   return (
     <>
-      <Group title="Pöttyök">
+      <Group title={t.design.dotsTitle}>
         <div className="grid grid-cols-4 gap-2">
-          {DOT_STYLES.map((s) => (
-            <Tile key={s.id} active={design.dots === s.id} onClick={() => set({ dots: s.id })} label={s.label}>
-              <DotSample style={s.id} />
+          {DOT_STYLES.map((id) => (
+            <Tile key={id} active={design.dots === id} onClick={() => set({ dots: id })} label={t.design.dots[id]}>
+              <DotSample style={id} />
             </Tile>
           ))}
         </div>
       </Group>
-      <Group title="Sarokjelek">
+      <Group title={t.design.eyesTitle}>
         <div className="grid grid-cols-4 gap-2">
-          {EYE_STYLES.map((s) => (
-            <Tile key={s.id} active={design.eyes === s.id} onClick={() => set({ eyes: s.id })} label={s.label}>
-              <EyeSample style={s.id} />
+          {EYE_STYLES.map((id) => (
+            <Tile key={id} active={design.eyes === id} onClick={() => set({ eyes: id })} label={t.design.eyes[id]}>
+              <EyeSample style={id} />
             </Tile>
           ))}
         </div>
@@ -163,10 +161,11 @@ function PatternTab({ design, set }: TabProps) {
 /* ---------------- Színek ---------------- */
 
 function ColorsTab({ design, set }: TabProps) {
+  const { t, fill } = useI18n();
   const issue = contrastIssue(design);
   return (
     <>
-      <Group title="Kész párosítások">
+      <Group title={t.design.palettesTitle}>
         <div className="flex flex-wrap gap-2">
           {PALETTES.map((p) => {
             const active = p.fg === design.fg && p.eye === design.eye && p.bg === design.bg;
@@ -174,8 +173,8 @@ function ColorsTab({ design, set }: TabProps) {
               <button
                 key={p.id}
                 type="button"
-                title={p.label}
-                aria-label={p.label}
+                title={t.design.palettes[p.id]}
+                aria-label={t.design.palettes[p.id]}
                 aria-pressed={active}
                 onClick={() => set({ fg: p.fg, eye: p.eye, bg: p.bg })}
                 className={`relative size-11 rounded-full border-2 transition-transform duration-200 hover:scale-110 ${
@@ -187,11 +186,11 @@ function ColorsTab({ design, set }: TabProps) {
           })}
         </div>
       </Group>
-      <Group title="Saját színek">
+      <Group title={t.design.customTitle}>
         <div className="grid gap-2 sm:grid-cols-3">
-          <ColorField label="Pöttyök" value={design.fg} onChange={(fg) => set({ fg })} />
-          <ColorField label="Sarokjelek" value={design.eye} onChange={(eye) => set({ eye })} />
-          <ColorField label="Háttér" value={design.bg} onChange={(bg) => set({ bg })} />
+          <ColorField label={t.design.fg} ariaLabel={fill(t.design.colorOf, { label: t.design.fg })} value={design.fg} onChange={(fg) => set({ fg })} />
+          <ColorField label={t.design.eye} ariaLabel={fill(t.design.colorOf, { label: t.design.eye })} value={design.eye} onChange={(eye) => set({ eye })} />
+          <ColorField label={t.design.bg} ariaLabel={fill(t.design.colorOf, { label: t.design.bg })} value={design.bg} onChange={(bg) => set({ bg })} />
         </div>
       </Group>
       <AnimatePresence>
@@ -203,9 +202,7 @@ function ColorsTab({ design, set }: TabProps) {
             className="flex items-start gap-2 overflow-hidden rounded-xl bg-coral-soft px-3 py-2.5 text-[13px] leading-snug text-coral-deep"
           >
             <IconAlert className="mt-px size-4 shrink-0" />
-            {issue === "inverted"
-              ? "A kód világosabb a hátterénél. Sok telefon csak a sötét-világos kódot olvassa be — cseréld meg a színeket."
-              : "Gyenge a kontraszt a kód és a háttér között, egyes telefonok nem fogják beolvasni."}
+            {issue === "inverted" ? t.design.inverted : t.design.lowContrast}
           </motion.p>
         )}
       </AnimatePresence>
@@ -213,7 +210,17 @@ function ColorsTab({ design, set }: TabProps) {
   );
 }
 
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function ColorField({
+  label,
+  ariaLabel,
+  value,
+  onChange,
+}: {
+  label: string;
+  ariaLabel: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   const [draft, setDraft] = useState(value);
   const [prev, setPrev] = useState(value);
   if (value !== prev) {
@@ -228,7 +235,7 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="absolute inset-0 size-full cursor-pointer opacity-0"
-          aria-label={`${label} színe`}
+          aria-label={ariaLabel}
         />
       </span>
       <span className="min-w-0">
@@ -253,6 +260,7 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
 /* ---------------- Logó ---------------- */
 
 function LogoTab({ design, set }: TabProps) {
+  const { t, error: errorText } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [over, setOver] = useState(false);
@@ -265,7 +273,7 @@ function LogoTab({ design, set }: TabProps) {
     try {
       set({ logo: await processLogo(file) });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "A képet nem sikerült feldolgozni.");
+      setError(errorText(e instanceof Error ? e.message : undefined));
     } finally {
       setBusy(false);
       if (input.current) input.current.value = "";
@@ -284,19 +292,19 @@ function LogoTab({ design, set }: TabProps) {
       {design.logo ? (
         <div className="flex items-center gap-4 rounded-2xl border border-ink/10 bg-white p-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={design.logo} alt="Feltöltött logó" className="size-16 rounded-xl bg-paper object-contain p-1.5" />
+          <img src={design.logo} alt={t.design.logoAlt} className="size-16 rounded-xl bg-paper object-contain p-1.5" />
           <div className="min-w-0 flex-1">
-            <div className="font-semibold">A logó a kód közepére kerül</div>
-            <p className="text-[13px] text-muted">Erősebb hibajavítást kapcsolunk be, így logóval is beolvasható marad.</p>
+            <div className="font-semibold">{t.design.logoOn}</div>
+            <p className="text-[13px] text-muted">{t.design.logoOnHint}</p>
           </div>
           <div className="flex shrink-0 gap-1.5">
             <button type="button" className="btn btn-ghost px-3 py-2 text-sm" onClick={() => input.current?.click()}>
-              Csere
+              {t.design.replace}
             </button>
             <button
               type="button"
               className="btn btn-ghost px-2.5 py-2 text-sm"
-              aria-label="Logó eltávolítása"
+              aria-label={t.design.removeLogo}
               onClick={() => set({ logo: null })}
             >
               <IconTrash className="size-4" />
@@ -324,8 +332,8 @@ function LogoTab({ design, set }: TabProps) {
           <span className={`grid size-11 place-items-center rounded-2xl bg-lime text-ink ${busy ? "animate-pulse" : ""}`}>
             <IconUpload />
           </span>
-          <span className="font-semibold">{busy ? "Feldolgozás…" : "Húzd ide a logódat, vagy kattints"}</span>
-          <span className="text-[13px] text-muted">PNG, JPG, WebP vagy SVG · átlátszó háttérrel mutat a legjobban</span>
+          <span className="font-semibold">{busy ? t.design.processing : t.design.drop}</span>
+          <span className="text-[13px] text-muted">{t.design.formats}</span>
         </button>
       )}
       {error && <p className="mt-3 text-[13px] font-medium text-coral-deep">{error}</p>}
@@ -335,9 +343,8 @@ function LogoTab({ design, set }: TabProps) {
 
 /* ---------------- Keret ---------------- */
 
-const FRAME_IDEAS = ["Olvass be!", "Nézd meg!", "Étlap", "Foglalj asztalt", "Kövess minket", "Rendelj online"];
-
 function FrameTab({ design, set }: TabProps) {
+  const { t } = useI18n();
   return (
     <div>
       <button
@@ -348,8 +355,8 @@ function FrameTab({ design, set }: TabProps) {
         className="flex w-full items-center justify-between gap-4 rounded-2xl border border-ink/10 bg-white p-4 text-left"
       >
         <span>
-          <span className="block font-semibold">Keret felirattal</span>
-          <span className="text-[13px] text-muted">Egy rövid felszólítás alatta többen olvassák be.</span>
+          <span className="block font-semibold">{t.design.frameToggle}</span>
+          <span className="text-[13px] text-muted">{t.design.frameToggleHint}</span>
         </span>
         <span className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${design.frame ? "bg-kobalt" : "bg-ink/15"}`}>
           <motion.span
@@ -362,7 +369,7 @@ function FrameTab({ design, set }: TabProps) {
 
       <div className={`mt-4 transition-opacity ${design.frame ? "" : "opacity-50"}`}>
         <label className="mb-2 block text-[13px] font-semibold tracking-wide text-muted uppercase" htmlFor="frame-text">
-          Felirat
+          {t.design.frameText}
         </label>
         <div className="relative">
           <input
@@ -377,18 +384,18 @@ function FrameTab({ design, set }: TabProps) {
           </span>
         </div>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {FRAME_IDEAS.map((t) => (
+          {t.design.frameIdeas.map((idea) => (
             <button
-              key={t}
+              key={idea}
               type="button"
-              onClick={() => set({ frameText: t, frame: true })}
+              onClick={() => set({ frameText: idea, frame: true })}
               className={`rounded-full border px-3 py-1 text-[13px] transition-colors ${
-                design.frameText === t && design.frame
+                design.frameText === idea && design.frame
                   ? "border-ink bg-ink text-paper"
                   : "border-ink/12 bg-white text-ink-2 hover:border-ink/30"
               }`}
             >
-              {t}
+              {idea}
             </button>
           ))}
         </div>

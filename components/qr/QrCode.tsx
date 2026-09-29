@@ -43,7 +43,7 @@ export function QrCode({ text, design, animate = true, className, label }: Props
       className={`qr ${animate ? "qr-anim" : ""} ${className ?? ""}`}
       style={vars}
       role="img"
-      aria-label={label ?? "QR-kód"}
+      aria-label={label ?? "QR code"}
     >
       {shape.frame ? (
         <>

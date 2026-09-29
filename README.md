@@ -29,3 +29,15 @@ demó fizetőoldal és „időutazás” gombok vannak a kezelőoldalon.
 A QR-kódokba a projekt éles domainje kerül (`VERCEL_PROJECT_PRODUCTION_URL`, a Vercel magától adja): saját
 domain esetén az, különben a `*.vercel.app` cím. Ha később saját domaint kötsz be, az új kódok azt kapják, a régiek
 a `vercel.app` címen működnek tovább – ezt a címet ezért ne vedd le a projektről.
+
+## Nyelvek és jogi szövegek
+
+- Öt nyelv: magyar, angol, német, francia, spanyol. Minden oldal `/<nyelv>/…` alatt él; a `proxy.ts` a nyelv
+  nélküli címeket a látogató nyelvére irányítja (süti → böngésző nyelve → angol). A QR-kódok rövid linkjei
+  (`/q/<kód>`) nyelvfüggetlenek.
+- Felületi szövegek: `lib/i18n/dictionaries/` (a `hu.ts` az eredeti, a típusa kötelezővé teszi a többi nyelvben is
+  ugyanazokat a kulcsokat).
+- ÁSZF és Adatkezelési tájékoztató: `lib/i18n/legal/` (a magyar az irányadó). A szolgáltató adatait, az áfa-mondatot
+  és a hatálybalépés dátumát a `lib/legal.ts`-ben kell kitölteni — amíg szögletes zárójeles helyőrző maradt, az
+  oldalakon figyelmeztetés látszik.
+

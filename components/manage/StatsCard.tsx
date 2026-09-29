@@ -3,15 +3,14 @@
 import { motion } from "motion/react";
 import { useState } from "react";
 import { IconChart } from "@/components/ui/Icons";
-import { fmtAgo, fmtNumber } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
 import type { CodeView } from "@/lib/types";
 
-const dayLabel = (key: string) => {
-  const [, m, d] = key.split("-").map(Number);
-  return `${m}. ${d}.`;
-};
-
 export function StatsCard({ code, now, alive }: { code: CodeView; now: number; alive: boolean }) {
+  const { t, plural, number, ago, shortDate } = useI18n();
+  const S = t.manage.stats;
+  // A napkulcs (ÉÉÉÉ-HH-NN) délben értelmezve: így az időzóna nem tolja át a szomszéd napra.
+  const dayLabel = (key: string) => shortDate(Date.parse(`${key}T12:00:00Z`));
   const [hover, setHover] = useState<number | null>(null);
   const max = Math.max(1, ...code.daily.map((d) => d.count));
   const last7 = code.daily.slice(-7).reduce((s, d) => s + d.count, 0);
@@ -20,23 +19,19 @@ export function StatsCard({ code, now, alive }: { code: CodeView; now: number; a
   return (
     <div className="card p-6 sm:p-7">
       <h2 className="flex items-center gap-2.5 text-lg font-semibold tracking-tight">
-        <IconChart className="size-5 text-kobalt" /> Beolvasások
+        <IconChart className="size-5 text-kobalt" /> {S.title}
       </h2>
 
       <div className="mt-5 grid grid-cols-3 gap-3">
-        <Stat label="Összesen" value={fmtNumber(code.scans)} />
-        <Stat label="Utolsó 7 nap" value={fmtNumber(last7)} />
-        <Stat label="Utolsó beolvasás" value={code.lastScanAt ? fmtAgo(code.lastScanAt, now) : "még nincs"} small />
+        <Stat label={S.total} value={number(code.scans)} />
+        <Stat label={S.last7} value={number(last7)} />
+        <Stat label={S.last} value={code.lastScanAt ? ago(code.lastScanAt, now) : S.none} small />
       </div>
 
       <div className="mt-6">
         <div className="mb-2 flex h-5 items-center justify-between text-[12px] text-muted">
-          <span>Utolsó 30 nap</span>
-          {shown && (
-            <span className="font-mono text-ink">
-              {dayLabel(shown.day)} · {shown.count} beolvasás
-            </span>
-          )}
+          <span>{S.last30}</span>
+          {shown && <span className="font-mono text-ink">{plural(S.day, shown.count, { date: dayLabel(shown.day) })}</span>}
         </div>
         <div className="flex h-28 items-end gap-[3px]" onMouseLeave={() => setHover(null)}>
           {code.daily.map((d, i) => (
@@ -55,9 +50,7 @@ export function StatsCard({ code, now, alive }: { code: CodeView; now: number; a
       </div>
       {code.scans === 0 && (
         <p className="mt-4 text-[13px] text-muted">
-          {alive
-            ? "Olvasd be a kódot a telefonoddal – az első beolvasás itt azonnal megjelenik."
-            : "Szünetelés alatt a beolvasásokat nem számoljuk."}
+          {alive ? S.emptyAlive : S.emptyPaused}
         </p>
       )}
     </div>

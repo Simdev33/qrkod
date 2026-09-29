@@ -5,6 +5,7 @@ import { paymentMode } from "./mode";
 import { sanitizeDesign, type Design } from "@/lib/design";
 import { dayKey } from "@/lib/format";
 import { CODE_RE, randomCode, randomToken } from "@/lib/ids";
+import { RETENTION_MONTHS } from "@/lib/legal";
 import { DAY, pricing } from "@/lib/site";
 import { lifeStatus } from "@/lib/status";
 import type { CodeView, SubStatus } from "@/lib/types";
@@ -197,4 +198,22 @@ export async function shiftDays(id: string, days: number) {
     "UPDATE codes SET created_at = created_at - ?, trial_ends_at = trial_ends_at - ?, paid_until = CASE WHEN paid_until IS NULL THEN NULL ELSE paid_until - ? END WHERE id = ?",
     [ms, ms, ms, id],
   );
+}
+
+/* ---------------- Megőrzési idő ---------------- */
+
+const g = globalThis as unknown as { __kockakodPurgedAt?: number };
+
+/**
+ * A megőrzési időn túl szünetelő kódok végleges törlése (Adatkezelési tájékoztató: {retentionMonths}
+ * hónap). Példányonként legfeljebb 12 óránként fut le, a kódkészítés után a háttérben.
+ */
+export async function purgeExpired(now = Date.now()) {
+  if (g.__kockakodPurgedAt && now - g.__kockakodPurgedAt < 12 * 60 * 60 * 1000) return;
+  g.__kockakodPurgedAt = now;
+  const cutoff = now - RETENTION_MONTHS * 30 * DAY;
+  const stale = `SELECT id FROM codes WHERE MAX(trial_ends_at, COALESCE(paid_until, 0)) < ?
+    AND (sub_status IS NULL OR sub_status NOT IN ('active', 'trialing', 'past_due'))`;
+  await run(`DELETE FROM scan_days WHERE code_id IN (${stale})`, [cutoff]);
+  await run(`DELETE FROM codes WHERE id IN (${stale})`, [cutoff]);
 }

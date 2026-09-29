@@ -1,21 +1,24 @@
 import "server-only";
 import { normalizeUrl } from "@/lib/format";
+import { DEFAULT_LOCALE, hasLocale, type Locale } from "@/lib/i18n/config";
 
-/** Cél-URL ellenőrzése: csak http(s), és nem mutathat vissza a saját rövid linkjeinkre (végtelen kör). */
+/**
+ * Cél-URL ellenőrzése: csak http(s), és nem mutathat vissza a saját rövid linkjeinkre (végtelen kör).
+ * Hibánál a szótár errors-kulcsát adja vissza, a felület ezt fordítja le.
+ */
 export function validTarget(raw: unknown, origin: string): { ok: true; url: string } | { ok: false; error: string } {
-  if (typeof raw !== "string") return { ok: false, error: "Add meg a linket, ahová a kód vezessen." };
+  if (typeof raw !== "string" || !raw.trim()) return { ok: false, error: "missing_target" };
   const url = normalizeUrl(raw);
-  if (!url) return { ok: false, error: "Ez nem tűnik érvényes webcímnek. Például: pelda.hu/menu" };
+  if (!url) return { ok: false, error: "invalid_url" };
   const u = new URL(url);
-  if (u.hostname === "localhost" && process.env.NODE_ENV === "production") {
-    return { ok: false, error: "Helyi címre nem mutathat a kód." };
-  }
+  if (u.hostname === "localhost" && process.env.NODE_ENV === "production") return { ok: false, error: "local_target" };
   const own = new URL(origin);
-  if (u.host === own.host && u.pathname.startsWith("/q/")) {
-    return { ok: false, error: "A kód nem mutathat egy másik Kockakód rövid linkre." };
-  }
+  if (u.host === own.host && u.pathname.startsWith("/q/")) return { ok: false, error: "loop_target" };
   return { ok: true, url };
 }
+
+/** A kérésben küldött nyelv (Stripe-oldal nyelve, visszatérési cím); ismeretlennél angol. */
+export const langOf = (value: unknown): Locale => (typeof value === "string" && hasLocale(value) ? value : DEFAULT_LOCALE);
 
 export async function readJson(req: Request): Promise<Record<string, unknown>> {
   try {

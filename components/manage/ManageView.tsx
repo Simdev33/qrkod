@@ -8,11 +8,12 @@ import { DesignControls } from "@/components/design/DesignControls";
 import { QrStage } from "@/components/qr/QrStage";
 import { CopyButton } from "@/components/ui/CopyButton";
 import { IconArrowRight, IconDownload, IconExternal, IconPalette, IconPencil } from "@/components/ui/Icons";
-import { api } from "@/lib/api";
+import { api, errorCode } from "@/lib/api";
 import type { Design } from "@/lib/design";
+import { useI18n } from "@/lib/i18n/client";
 import { rememberCode } from "@/lib/local-codes";
 import { downloadQr } from "@/lib/qr/export";
-import { lifeStatus, PHASE_LABEL } from "@/lib/status";
+import { lifeStatus } from "@/lib/status";
 import type { CodeView, PaymentMode } from "@/lib/types";
 import { DangerZone, DemoTools, ManageLinkCard } from "./ExtraCards";
 import { LifeCard } from "./LifeCard";
@@ -36,6 +37,8 @@ export function ManageView({
   flash: Flash;
 }) {
   const router = useRouter();
+  const { t, l, error: errorText } = useI18n();
+  const M = t.manage;
   const [code, setCode] = useState(initial);
   const [now, setNow] = useState(serverNow);
   const [draft, setDraft] = useState<Design | null>(null);
@@ -43,7 +46,8 @@ export function ManageView({
   const [banner, setBanner] = useState<Flash>(flash);
 
   const shortUrl = `${origin}/q/${code.id}`;
-  const manageUrl = `${origin}/kezeles/${code.token}`;
+  // Nyelv nélküli kezelőlink: megnyitáskor a látogató saját nyelvén jelenik meg.
+  const manageUrl = `${origin}/manage/${code.token}`;
   const status = lifeStatus(code, now);
   const design = draft ?? code.design;
 
@@ -55,14 +59,14 @@ export function ManageView({
   }, [code.id, code.token, code.title, code.createdAt]);
 
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 60_000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(timer);
   }, []);
 
-  // A ?uj=1 / ?fizetes=… paramétert eltüntetjük, hogy frissítéskor ne jöjjön újra az üzenet.
+  // A ?new=1 / ?payment=… paramétert eltüntetjük, hogy frissítéskor ne jöjjön újra az üzenet.
   useEffect(() => {
-    if (flash) router.replace(`/kezeles/${code.token}`, { scroll: false });
-  }, [flash, code.token, router]);
+    if (flash) router.replace(l(`/manage/${code.token}`), { scroll: false });
+  }, [flash, code.token, router, l]);
 
   useEffect(() => {
     if (!toast) return;
@@ -81,17 +85,17 @@ export function ManageView({
       const { code: next } = await api(`/api/codes/${code.token}`, "PATCH", { design: draft });
       update(next);
       setDraft(null);
-      notify("Elmentve. A letöltött kódot cseréld le az újra.");
+      notify(M.designSaved);
     } catch (e) {
-      notify((e as Error).message, "error");
+      notify(errorText(errorCode(e)), "error");
     }
   }
 
   async function download(format: "png" | "svg", px?: number) {
     try {
-      await downloadQr(shortUrl, design, format, `kockakod-${code.id}${px && px > 1200 ? "-nagy" : ""}`, px);
+      await downloadQr(shortUrl, design, format, `kockakod-${code.id}${px && px > 1200 ? "-large" : ""}`, px);
     } catch (e) {
-      notify((e as Error).message, "error");
+      notify(errorText(errorCode(e)), "error");
     }
   }
 
@@ -107,21 +111,21 @@ export function ManageView({
         className="flex flex-wrap items-end justify-between gap-5"
       >
         <div className="min-w-0">
-          <Link href="/kodjaim" className="text-sm font-medium text-muted hover:text-ink">
-            ← Kódjaim
+          <Link href={l("/my-codes")} className="text-sm font-medium text-muted hover:text-ink">
+            {M.back}
           </Link>
           <TitleEditor code={code} onSaved={update} notify={notify} />
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <StatusPill phase={status.phase} />
             <span className="flex items-center gap-1 rounded-full border border-ink/12 bg-card py-1 pr-1 pl-3 font-mono text-[13px]">
               {shortUrl.replace(/^https?:\/\//, "")}
-              <CopyButton text={shortUrl} label="Rövid link másolása" compact />
+              <CopyButton text={shortUrl} label={M.copyShort} compact />
               <a
                 href={shortUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="grid size-7 place-items-center rounded-full text-muted hover:bg-ink/5 hover:text-ink"
-                aria-label="Kipróbálás új lapon"
+                aria-label={M.openNew}
               >
                 <IconExternal className="size-3.5" />
               </a>
@@ -150,26 +154,24 @@ export function ManageView({
                   transition={{ type: "spring", stiffness: 300, damping: 14, delay: 0.5 }}
                   className="display absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-[1.5px] border-ink bg-coral px-5 py-2.5 text-xl text-white shadow-[4px_4px_0_var(--color-ink)]"
                 >
-                  SZÜNETEL
+                  {M.pausedStamp}
                 </motion.span>
               )}
             </div>
 
             <div className="mt-5 grid grid-cols-3 gap-2">
               <button type="button" className="btn btn-ink px-3 text-sm" onClick={() => download("png", 1200)}>
-                <IconDownload className="size-4" /> PNG
+                <IconDownload className="size-4" /> {M.png}
               </button>
               <button type="button" className="btn btn-ghost px-3 text-sm" onClick={() => download("png", 2400)}>
-                PNG nagy
+                {M.pngLarge}
               </button>
               <button type="button" className="btn btn-ghost px-3 text-sm" onClick={() => download("svg")}>
-                SVG
+                {M.svg}
               </button>
             </div>
             <p className="mt-3 text-center text-[13px] text-muted">
-              {status.alive
-                ? "Nyomtatás előtt olvasd be a telefonoddal is."
-                : "A letöltött kód is szünetel, amíg újra elő nem fizetsz."}
+              {status.alive ? M.testHint : M.pausedHint}
             </p>
 
             <DesignEditor
@@ -219,6 +221,7 @@ export function ManageView({
 }
 
 function StatusPill({ phase }: { phase: ReturnType<typeof lifeStatus>["phase"] }) {
+  const { t } = useI18n();
   const tone = {
     trial: "bg-lime text-ink",
     scheduled: "bg-kobalt text-white",
@@ -229,12 +232,13 @@ function StatusPill({ phase }: { phase: ReturnType<typeof lifeStatus>["phase"] }
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold ${tone}`}>
       <span className={`size-1.5 rounded-full bg-current ${phase === "expired" ? "" : "animate-blink"}`} />
-      {PHASE_LABEL[phase]}
+      {t.status[phase]}
     </span>
   );
 }
 
 function TitleEditor({ code, onSaved, notify }: { code: CodeView; onSaved: (c: CodeView) => void; notify: Notify }) {
+  const { t, error: errorText } = useI18n();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(code.title);
 
@@ -244,7 +248,7 @@ function TitleEditor({ code, onSaved, notify }: { code: CodeView; onSaved: (c: C
       onSaved(next);
       setEditing(false);
     } catch (e) {
-      notify((e as Error).message, "error");
+      notify(errorText(errorCode(e)), "error");
     }
   }
 
@@ -257,16 +261,16 @@ function TitleEditor({ code, onSaved, notify }: { code: CodeView; onSaved: (c: C
           save();
         }}
       >
-        <input autoFocus className="field text-lg" value={value} maxLength={60} onChange={(e) => setValue(e.target.value)} placeholder="Megnevezés" />
+        <input autoFocus className="field text-lg" value={value} maxLength={60} onChange={(e) => setValue(e.target.value)} placeholder={t.manage.titlePlaceholder} />
         <button className="btn btn-ink" type="submit">
-          Mentés
+          {t.common.save}
         </button>
       </form>
     );
   }
   return (
     <button type="button" onClick={() => setEditing(true)} className="group mt-2 flex max-w-full items-center gap-3 text-left">
-      <h1 className="display text-[clamp(1.9rem,4.4vw,3.2rem)] min-w-0 leading-[1.05] break-words sm:truncate">{code.title || "Névtelen QR-kód"}</h1>
+      <h1 className="display text-[clamp(1.9rem,4.4vw,3.2rem)] min-w-0 leading-[1.05] break-words sm:truncate">{code.title || t.manage.untitled}</h1>
       <IconPencil className="size-5 shrink-0 text-muted opacity-0 transition-opacity group-hover:opacity-100" />
     </button>
   );
@@ -285,12 +289,13 @@ function DesignEditor({
   onSave: () => void;
   onReset: () => void;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-5 border-t border-ink/10 pt-5">
       <button type="button" className="flex w-full items-center justify-between gap-3 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className="flex items-center gap-2.5 font-semibold">
-          <IconPalette className="size-5 text-kobalt" /> Megjelenés szerkesztése
+          <IconPalette className="size-5 text-kobalt" /> {t.manage.designEdit}
         </span>
         <motion.span animate={{ rotate: open ? 90 : 0 }} className="text-muted">
           <IconArrowRight className="size-4" />
@@ -320,10 +325,10 @@ function DesignEditor({
             className="mt-4 flex gap-2"
           >
             <button type="button" className="btn btn-primary flex-1" onClick={onSave}>
-              Változások mentése
+              {t.manage.saveChanges}
             </button>
             <button type="button" className="btn btn-ghost" onClick={onReset}>
-              Elvetés
+              {t.manage.discard}
             </button>
           </motion.div>
         )}
@@ -333,22 +338,12 @@ function DesignEditor({
 }
 
 function Banner({ kind, manageUrl, onClose }: { kind: Exclude<Flash, null>; manageUrl: string; onClose: () => void }) {
+  const { t } = useI18n();
+  const B = t.manage.banner;
   const content = {
-    new: {
-      tone: "bg-lime",
-      title: "Elkészült a QR-kódod! 30 napig ingyen működik.",
-      text: "Mentsd el ezt a kezelőoldalt – ezzel a linkkel éred el később is a kódodat, regisztráció nélkül.",
-    },
-    paid: {
-      tone: "bg-kobalt text-white",
-      title: "Köszönjük! Az előfizetés él.",
-      text: "A kódod megszakítás nélkül működik tovább. A számlát a Stripe e-mailben küldi.",
-    },
-    "checkout-canceled": {
-      tone: "bg-sun",
-      title: "A fizetés megszakadt.",
-      text: "Semmit nem terheltünk. Bármikor újra megpróbálhatod.",
-    },
+    new: { tone: "bg-lime", title: B.newTitle, text: B.newText },
+    paid: { tone: "bg-kobalt text-white", title: B.paidTitle, text: B.paidText },
+    "checkout-canceled": { tone: "bg-sun", title: B.canceledTitle, text: B.canceledText },
   }[kind];
 
   return (
@@ -365,9 +360,9 @@ function Banner({ kind, manageUrl, onClose }: { kind: Exclude<Flash, null>; mana
           <p className="mt-1 opacity-80">{content.text}</p>
         </div>
         <div className="flex items-center gap-2">
-          {kind === "new" && <CopyButton text={manageUrl} label="Kezelőlink másolása" />}
+          {kind === "new" && <CopyButton text={manageUrl} label={t.manage.link.copy} />}
           <button type="button" onClick={onClose} className="btn px-3 py-2 text-sm underline-offset-4 hover:underline">
-            Bezárás
+            {t.common.close}
           </button>
         </div>
       </div>

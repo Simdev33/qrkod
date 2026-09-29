@@ -48,17 +48,17 @@ export async function svgToPngBlob(svg: string, width: number, height: number): 
   img.decoding = "async";
   await new Promise<void>((resolve, reject) => {
     img.onload = () => resolve();
-    img.onerror = () => reject(new Error("A kép nem rajzolható ki."));
+    img.onerror = () => reject(new Error("export_failed"));
     img.src = url;
   });
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("A böngésző nem támogatja a vásznat.");
+  if (!ctx) throw new Error("export_failed");
   ctx.drawImage(img, 0, 0, width, height);
   return new Promise((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("A PNG nem készült el."))), "image/png"),
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("export_failed"))), "image/png"),
   );
 }
 

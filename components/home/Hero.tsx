@@ -2,6 +2,8 @@
 
 import { motion } from "motion/react";
 import { LineReveal } from "@/components/ui/Reveal";
+import { Rich } from "@/components/ui/Rich";
+import { useI18n } from "@/lib/i18n/client";
 
 // Lebegő „pixelek” a cím körül: a QR-modulok visszhangja, színes részletek a világos alapon.
 const PIXELS = [
@@ -14,6 +16,7 @@ const PIXELS = [
 ];
 
 export function Hero({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   return (
     <section className="relative overflow-x-clip">
       <div
@@ -52,16 +55,16 @@ export function Hero({ children }: { children: React.ReactNode }) {
               <span className="absolute inset-0 animate-ping rounded-full bg-kobalt/60" />
               <span className="relative size-2 rounded-full bg-kobalt" />
             </span>
-            Dinamikus QR-kód · az első hónap ingyen
+            {t.hero.eyebrow}
           </motion.span>
 
           <h1 className="display mt-6 text-[clamp(2.4rem,6vw,5.4rem)] leading-[0.94]">
             <LineReveal
               delay={0.1}
               lines={[
-                "Nyomtasd ki egyszer,",
+                t.hero.line1,
                 <>
-                  irányítsd <span className="marker">bármikor.</span>
+                  {t.hero.line2} <span className="marker">{t.hero.line2Mark}</span>
                 </>,
               ]}
             />
@@ -73,14 +76,12 @@ export function Hero({ children }: { children: React.ReactNode }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
-            Készíts QR-kódot pár másodperc alatt. <strong className="font-semibold text-ink">30 napig ingyen működik</strong>,
-            utána <strong className="font-semibold text-ink">havi 1 dollárért</strong> él tovább — a mögötte lévő linket pedig
-            közben bármikor átírhatod.
+            <Rich text={t.hero.lead} />
           </motion.p>
         </div>
 
         <motion.div
-          id="keszito"
+          id="create"
           className="relative mt-10 scroll-mt-28 sm:mt-14"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}

@@ -2,6 +2,9 @@ import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { applySubscription, getById, getBySubscription, type CodeRow } from "./codes";
 import { paymentMode } from "./mode";
+import { fill } from "@/lib/i18n/format";
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/server";
 import { brand, DAY, pricing } from "@/lib/site";
 import { isSubscribed } from "@/lib/status";
 import type { SubStatus } from "@/lib/types";
@@ -82,28 +85,30 @@ const TRIAL_MIN_LEAD = 49 * 60 * 60 * 1000;
 /** Elég idő van-e még a próbaidőből ahhoz, hogy az első terhelés a próbaidő végére essen. */
 export const trialHasLead = (row: CodeRow, now = Date.now()) => row.trial_ends_at - now > TRIAL_MIN_LEAD;
 
-/** A fizetőoldal címe: Stripe Checkout, vagy fejlesztéskor a demó oldal. */
-export async function createCheckout(row: CodeRow, origin: string): Promise<string> {
+/** A fizetőoldal címe: Stripe Checkout, vagy fejlesztéskor a demó oldal. A Stripe-oldal a látogató nyelvén jelenik meg. */
+export async function createCheckout(row: CodeRow, origin: string, lang: Locale): Promise<string> {
   const mode = paymentMode();
-  if (mode === "demo") return `${origin}/fizetes/demo/${row.token}`;
-  if (mode === "off") throw new Error("Az előfizetés jelenleg nem érhető el.");
+  if (mode === "demo") return `${origin}/${lang}/pay/demo/${row.token}`;
+  if (mode === "off") throw new Error("payments_off");
 
-  const manage = `${origin}/kezeles/${row.token}`;
+  const t = getDictionary(lang).billing;
+  const vars = { brand: brand.name, id: row.id };
+  const manage = `${origin}/${lang}/manage/${row.token}`;
   const body = new URLSearchParams({
     mode: "subscription",
-    locale: "hu",
+    locale: lang,
     client_reference_id: row.id,
     "metadata[code]": row.id,
     "subscription_data[metadata][code]": row.id,
-    "subscription_data[description]": `${brand.name} QR-kód: ${row.id}`,
+    "subscription_data[description]": fill(t.subscriptionDescription, vars),
     "line_items[0][quantity]": "1",
     "line_items[0][price_data][currency]": pricing.currency,
     "line_items[0][price_data][unit_amount]": String(pricing.monthlyCents),
     "line_items[0][price_data][recurring][interval]": "month",
-    "line_items[0][price_data][product_data][name]": `${brand.name} · QR-kód életben tartása`,
-    "line_items[0][price_data][product_data][description]": `A(z) ${row.id} kódú QR-kód havi díja. Bármikor lemondható.`,
-    success_url: `${manage}?fizetes=siker&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${manage}?fizetes=megszakitva`,
+    "line_items[0][price_data][product_data][name]": fill(t.productName, vars),
+    "line_items[0][price_data][product_data][description]": fill(t.productDescription, vars),
+    success_url: `${manage}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${manage}?payment=canceled`,
   });
   if (trialHasLead(row)) {
     body.set("subscription_data[trial_end]", String(Math.floor(row.trial_ends_at / 1000)));
@@ -111,7 +116,7 @@ export async function createCheckout(row: CodeRow, origin: string): Promise<stri
   if (row.customer_id) body.set("customer", row.customer_id);
 
   const session = await stripe<CheckoutSession>("/checkout/sessions", { method: "POST", body });
-  if (!session.url) throw new Error("A Stripe nem adott vissza fizetési oldalt.");
+  if (!session.url) throw new Error("payment_failed");
   return session.url;
 }
 
@@ -134,7 +139,7 @@ export async function confirmCheckout(sessionId: string, row: CodeRow) {
 
 /** Lemondás a kifizetett időszak végére (cancel = true), illetve a lemondás visszavonása. */
 export async function setCancelAtPeriodEnd(row: CodeRow, cancel: boolean) {
-  if (!row.sub_id) throw new Error("Ehhez a kódhoz nincs előfizetés.");
+  if (!row.sub_id) throw new Error("no_subscription");
   if (row.sub_id.startsWith("demo_")) {
     await applySubscription(row.id, {
       id: row.sub_id,
@@ -158,11 +163,11 @@ export async function cancelImmediately(row: CodeRow) {
 }
 
 /** Stripe ügyfélportál: bankkártya cseréje, számlák letöltése. */
-export async function portalUrl(row: CodeRow, origin: string) {
-  if (paymentMode() !== "stripe" || !row.customer_id) throw new Error("Ehhez a kódhoz nincs fizetési fiók.");
+export async function portalUrl(row: CodeRow, origin: string, lang: Locale) {
+  if (paymentMode() !== "stripe" || !row.customer_id) throw new Error("no_customer");
   const s = await stripe<{ url: string }>("/billing_portal/sessions", {
     method: "POST",
-    body: new URLSearchParams({ customer: row.customer_id, return_url: `${origin}/kezeles/${row.token}`, locale: "hu" }),
+    body: new URLSearchParams({ customer: row.customer_id, return_url: `${origin}/${lang}/manage/${row.token}`, locale: lang }),
   });
   return s.url;
 }
@@ -224,7 +229,7 @@ export async function handleEvent(event: StripeEvent) {
 /* ---------------- Fejlesztői demó (Stripe-kulcs nélkül) ---------------- */
 
 export async function demoSubscribe(row: CodeRow, now = Date.now()) {
-  if (paymentMode() !== "demo") throw new Error("A demó fizetés csak fejlesztői módban érhető el.");
+  if (paymentMode() !== "demo") throw new Error("payments_off");
   const inTrial = trialHasLead(row, now);
   await applySubscription(row.id, {
     id: row.sub_id?.startsWith("demo_") ? row.sub_id : `demo_${row.id}_${now.toString(36)}`,

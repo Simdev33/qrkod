@@ -43,11 +43,3 @@ export function lifeStatus(c: StatusInput, now: number): LifeStatus {
     trialProgress,
   };
 }
-
-export const PHASE_LABEL: Record<Phase, string> = {
-  trial: "Ingyenes hónap",
-  scheduled: "Előfizetve",
-  active: "Aktív előfizetés",
-  canceling: "Lemondva",
-  expired: "Szünetel",
-};

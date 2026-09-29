@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { useI18n } from "@/lib/i18n/client";
 import { brand } from "@/lib/site";
+import { LanguageRow } from "./LanguageSwitcher";
 import { LogoMark } from "./Logo";
 
 export function Footer() {
+  const { t, l } = useI18n();
   return (
     <footer className="relative mt-24 overflow-hidden bg-ink text-paper">
       <div className="dot-grid-light absolute inset-0 opacity-60" aria-hidden />
@@ -12,23 +17,25 @@ export function Footer() {
             <LogoMark className="size-9 [&_rect:first-child]:fill-paper [&_path]:fill-ink" />
             <span className="display text-[19px]">{brand.name}</span>
           </div>
-          <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-paper/65">
-            Dinamikus QR-kódok, amiket egyszer nyomtatsz ki, és bármikor átirányíthatsz. 30 napig ingyen, utána havi 1 dollár.
-          </p>
+          <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-paper/65">{t.footer.tagline}</p>
+          <div className="mt-6">
+            <LanguageRow dark />
+          </div>
         </div>
         <div>
-          <div className="mb-3 text-[13px] font-semibold tracking-wider text-paper/45 uppercase">Oldalak</div>
+          <div className="mb-3 text-[13px] font-semibold tracking-wider text-paper/45 uppercase">{t.footer.pages}</div>
           <ul className="space-y-2 text-[15px]">
-            <li><Link className="text-paper/80 hover:text-lime" href="/#keszito">QR-kód készítése</Link></li>
-            <li><Link className="text-paper/80 hover:text-lime" href="/kodjaim">Kódjaim</Link></li>
-            <li><Link className="text-paper/80 hover:text-lime" href="/#arazas">Árazás</Link></li>
-            <li><Link className="text-paper/80 hover:text-lime" href="/#gyik">GYIK</Link></li>
+            <li><Link className="text-paper/80 hover:text-lime" href={l("/#create")}>{t.footer.create}</Link></li>
+            <li><Link className="text-paper/80 hover:text-lime" href={l("/my-codes")}>{t.nav.myCodes}</Link></li>
+            <li><Link className="text-paper/80 hover:text-lime" href={l("/#pricing")}>{t.nav.pricing}</Link></li>
+            <li><Link className="text-paper/80 hover:text-lime" href={l("/#faq")}>{t.nav.faq}</Link></li>
           </ul>
         </div>
         <div>
-          <div className="mb-3 text-[13px] font-semibold tracking-wider text-paper/45 uppercase">Tudnivalók</div>
+          <div className="mb-3 text-[13px] font-semibold tracking-wider text-paper/45 uppercase">{t.footer.legal}</div>
           <ul className="space-y-2 text-[15px]">
-            <li><Link className="text-paper/80 hover:text-lime" href="/feltetelek">Feltételek és adatvédelem</Link></li>
+            <li><Link className="text-paper/80 hover:text-lime" href={l("/terms")}>{t.footer.terms}</Link></li>
+            <li><Link className="text-paper/80 hover:text-lime" href={l("/privacy")}>{t.footer.privacy}</Link></li>
             <li><a className="text-paper/80 hover:text-lime" href={`mailto:${brand.email}`}>{brand.email}</a></li>
           </ul>
         </div>
@@ -36,7 +43,9 @@ export function Footer() {
       <div className="relative border-t border-paper/10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-[13px] text-paper/45">
           <span>© {new Date().getFullYear()} {brand.name}</span>
-          <span>A fizetést a Stripe kezeli · a „QR Code” a DENSO WAVE bejegyzett védjegye</span>
+          <span>
+            {t.footer.payments} · {t.footer.trademark}
+          </span>
         </div>
       </div>
     </footer>

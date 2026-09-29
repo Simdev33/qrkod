@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n/client";
 import { IconCheck, IconCopy } from "./Icons";
 
 async function copy(text: string) {
@@ -23,6 +24,7 @@ async function copy(text: string) {
 }
 
 export function CopyButton({ text, label, compact = false }: { text: string; label: string; compact?: boolean }) {
+  const { t } = useI18n();
   const [done, setDone] = useState(false);
 
   async function onClick() {
@@ -63,7 +65,7 @@ export function CopyButton({ text, label, compact = false }: { text: string; lab
   return (
     <button type="button" onClick={onClick} className="btn btn-ghost px-4 py-2.5 text-sm">
       {icon}
-      {done ? "Másolva!" : label}
+      {done ? t.common.copied : label}
     </button>
   );
 }

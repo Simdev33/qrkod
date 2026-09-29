@@ -6,36 +6,24 @@ import { QrCode } from "@/components/qr/QrCode";
 import { IconCheck } from "@/components/ui/Icons";
 import { Reveal } from "@/components/ui/Reveal";
 import { DEFAULT_DESIGN } from "@/lib/design";
+import { useI18n } from "@/lib/i18n/client";
 import { brand } from "@/lib/site";
 
-const STEPS = [
-  {
-    title: "Illeszd be a linket",
-    text: "Weboldal, étlap-PDF, foglalási oldal, Instagram-profil – bármi, aminek van webcíme.",
-  },
-  {
-    title: "Szabd testre és töltsd le",
-    text: "Színek, pöttyminta, logó, keret felirattal. PNG-ben vagy nyomdakész SVG-ben.",
-  },
-  {
-    title: "Irányítsd át, amikor csak kell",
-    text: "A kód a rövid linkedre mutat. Ha változik az ajánlat, csak átírod a célt – a kinyomtatott kód ugyanaz marad.",
-  },
-];
 
 export function HowItWorks() {
+  const { t } = useI18n();
   return (
-    <section id="hogyan" className="relative mx-auto max-w-6xl scroll-mt-24 px-4 pt-24 sm:px-5 sm:pt-32">
+    <section id="how" className="relative mx-auto max-w-6xl scroll-mt-24 px-4 pt-24 sm:px-5 sm:pt-32">
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
         <div>
           <Reveal>
-            <span className="eyebrow">Hogyan működik</span>
+            <span className="eyebrow">{t.how.eyebrow}</span>
             <h2 className="display mt-5 text-[clamp(2rem,4.6vw,3.6rem)] leading-[0.98]">
-              Egy kód, ami mindig oda visz, <span className="text-kobalt">ahová kell.</span>
+              {t.how.title} <span className="text-kobalt">{t.how.titleAccent}</span>
             </h2>
           </Reveal>
           <ol className="mt-10 space-y-4">
-            {STEPS.map((s, i) => (
+            {t.how.steps.map((s, i) => (
               <Reveal key={s.title} delay={i * 0.08}>
                 <li className="group flex gap-5 rounded-3xl border border-transparent p-4 transition-colors hover:border-ink/10 hover:bg-card/70 sm:p-5">
                   <span className="display grid size-12 shrink-0 place-items-center rounded-2xl bg-ink text-xl text-lime transition-transform duration-300 group-hover:-rotate-6">
@@ -58,24 +46,21 @@ export function HowItWorks() {
   );
 }
 
-const TARGETS = [
-  { url: "bisztro.hu/tavaszi-etlap.pdf", title: "Tavaszi étlap", tone: "bg-sun" },
-  { url: "bisztro.hu/nyari-etlap.pdf", title: "Nyári étlap", tone: "bg-lime" },
-  { url: "bisztro.hu/asztalfoglalas", title: "Asztalfoglalás", tone: "bg-sky" },
-];
+const TONES = ["bg-sun", "bg-lime", "bg-sky"];
 
 function RedirectDemo() {
+  const d = useI18n().t.how.demo;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { margin: "-10% 0px" });
   const [i, setI] = useState(0);
 
   useEffect(() => {
     if (!inView) return;
-    const t = setInterval(() => setI((v) => (v + 1) % TARGETS.length), 3000);
-    return () => clearInterval(t);
-  }, [inView]);
+    const timer = setInterval(() => setI((v) => (v + 1) % d.targets.length), 3000);
+    return () => clearInterval(timer);
+  }, [inView, d.targets.length]);
 
-  const t = TARGETS[i];
+  const t = { ...d.targets[i], tone: TONES[i % TONES.length] };
   const short = `${brand.domain}/q/7kp2xa`;
 
   return (
@@ -87,8 +72,8 @@ function RedirectDemo() {
             <QrCode text={`https://${short}`} design={DEFAULT_DESIGN} animate={false} className="block h-auto w-full" />
           </div>
           <div>
-            <div className="text-[12px] font-semibold tracking-wider text-muted uppercase">1 · Kinyomtatott kód</div>
-            <div className="mt-0.5 font-semibold">Ez soha nem változik</div>
+            <div className="text-[12px] font-semibold tracking-wider text-muted uppercase">{d.printed}</div>
+            <div className="mt-0.5 font-semibold">{d.printedText}</div>
           </div>
         </div>
 
@@ -97,7 +82,7 @@ function RedirectDemo() {
         <div className="flex items-center gap-3 self-stretch rounded-2xl bg-ink p-4 text-paper">
           <span className="grid size-10 place-items-center rounded-xl bg-lime font-mono text-sm font-bold text-ink">→</span>
           <div className="min-w-0">
-            <div className="text-[12px] font-semibold tracking-wider text-paper/55 uppercase">2 · A te rövid linked</div>
+            <div className="text-[12px] font-semibold tracking-wider text-paper/55 uppercase">{d.short}</div>
             <div className="truncate font-mono text-[15px]">{short}</div>
           </div>
         </div>
@@ -123,7 +108,7 @@ function RedirectDemo() {
               </div>
               <div className="flex items-center justify-between gap-4 px-4 py-4">
                 <div>
-                  <div className="text-[12px] font-semibold tracking-wider text-muted uppercase">3 · Cél</div>
+                  <div className="text-[12px] font-semibold tracking-wider text-muted uppercase">{d.target}</div>
                   <div className="display mt-1 text-xl">{t.title}</div>
                 </div>
                 <div className="grid w-24 gap-1.5" aria-hidden>
@@ -143,7 +128,7 @@ function RedirectDemo() {
               transition={{ duration: 2.4, times: [0, 0.12, 0.8, 1], delay: 0.5 }}
               className="absolute -top-4 right-3 flex items-center gap-1.5 rounded-full bg-kobalt px-3 py-1.5 text-[13px] font-semibold text-white shadow-lg"
             >
-              <IconCheck className="size-3.5" strokeWidth={3} /> Cél átírva
+              <IconCheck className="size-3.5" strokeWidth={3} /> {d.updated}
             </motion.div>
           </AnimatePresence>
         </div>

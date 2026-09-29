@@ -4,18 +4,15 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
+import { useI18n } from "@/lib/i18n/client";
 import { onLocalCodesChange, readLocalCodes } from "@/lib/local-codes";
+import { LanguageRow, LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
-
-const NAV = [
-  { href: "/#hogyan", label: "Hogyan működik" },
-  { href: "/#arazas", label: "Árazás" },
-  { href: "/#gyik", label: "GYIK" },
-];
 
 const codeCount = () => readLocalCodes().length;
 
 export function Header() {
+  const { t, l, fill } = useI18n();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -28,6 +25,12 @@ export function Header() {
     setLastPath(pathname);
     setOpen(false);
   }
+
+  const nav = [
+    { href: l("/#how"), label: t.nav.how },
+    { href: l("/#pricing"), label: t.nav.pricing },
+    { href: l("/#faq"), label: t.nav.faq },
+  ];
 
   return (
     <motion.header
@@ -43,10 +46,10 @@ export function Header() {
             : "border border-transparent"
         }`}
       >
-        <Logo />
+        <Logo href={l("/")} label={fill(t.nav.home)} />
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Fő navigáció">
-          {NAV.map((n) => (
+        <nav className="hidden items-center gap-1 lg:flex" aria-label={t.nav.mainNav}>
+          {nav.map((n) => (
             <Link key={n.href} href={n.href} className="rounded-xl px-3.5 py-2 text-[15px] font-medium text-ink-2 transition-colors hover:bg-ink/5 hover:text-ink">
               {n.label}
             </Link>
@@ -54,21 +57,22 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link href="/kodjaim" className="btn btn-ghost hidden px-4 py-2.5 text-sm sm:inline-flex">
-            Kódjaim
+          <LanguageSwitcher className="hidden sm:block" />
+          <Link href={l("/my-codes")} className="btn btn-ghost hidden px-4 py-2.5 text-sm sm:inline-flex">
+            {t.nav.myCodes}
             {count > 0 && (
               <span className="grid min-w-5 place-items-center rounded-full bg-ink px-1.5 py-0.5 font-mono text-[11px] leading-none text-lime">
                 {count}
               </span>
             )}
           </Link>
-          <Link href="/#keszito" className="btn btn-lime hidden px-4 py-2.5 text-sm sm:inline-flex">
-            Kód készítése
+          <Link href={l("/#create")} className="btn btn-lime hidden px-4 py-2.5 text-sm sm:inline-flex">
+            {t.nav.create}
           </Link>
           <button
             type="button"
-            className="grid size-11 place-items-center rounded-xl md:hidden"
-            aria-label={open ? "Menü bezárása" : "Menü megnyitása"}
+            className="grid size-11 place-items-center rounded-xl lg:hidden"
+            aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
             aria-expanded={open}
             onClick={() => setOpen((o) => !o)}
           >
@@ -88,16 +92,19 @@ export function Header() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="card mx-auto mt-2 grid max-w-6xl gap-1 p-2 md:hidden"
-            aria-label="Mobil navigáció"
+            className="card mx-auto mt-2 grid max-w-6xl gap-1 p-2 lg:hidden"
+            aria-label={t.nav.mobileNav}
           >
-            {[...NAV, { href: "/kodjaim", label: count ? `Kódjaim (${count})` : "Kódjaim" }].map((n) => (
+            {[...nav, { href: l("/my-codes"), label: count ? `${t.nav.myCodes} (${count})` : t.nav.myCodes }].map((n) => (
               <Link key={n.href} href={n.href} onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium hover:bg-ink/5">
                 {n.label}
               </Link>
             ))}
-            <Link href="/#keszito" onClick={() => setOpen(false)} className="btn btn-lime mt-1">
-              Kód készítése
+            <div className="px-3 py-2">
+              <LanguageRow onPick={() => setOpen(false)} />
+            </div>
+            <Link href={l("/#create")} onClick={() => setOpen(false)} className="btn btn-lime mt-1">
+              {t.nav.create}
             </Link>
           </motion.nav>
         )}

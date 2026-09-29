@@ -6,16 +6,22 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { DesignControls } from "@/components/design/DesignControls";
 import { QrStage } from "@/components/qr/QrStage";
 import { IconArrowRight, IconCheck, IconLink } from "@/components/ui/Icons";
+import { Rich } from "@/components/ui/Rich";
 import { DEFAULT_DESIGN, type Design } from "@/lib/design";
 import { normalizeUrl, prettyUrl } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
 import { randomCode } from "@/lib/ids";
 import { rememberCode } from "@/lib/local-codes";
+import { api, errorCode } from "@/lib/api";
 
 export function Generator({ origin, candidate: initialCandidate }: { origin: string; candidate: string }) {
   const router = useRouter();
+  const { t, l, error: errorText } = useI18n();
+  const G = t.generator;
   const [raw, setRaw] = useState("");
   const [title, setTitle] = useState("");
-  const [design, setDesign] = useState<Design>(DEFAULT_DESIGN);
+  // A keret alapfelirata a látogató nyelvén indul („Olvass be!”, „Scan me!”…).
+  const [design, setDesign] = useState<Design>(() => ({ ...DEFAULT_DESIGN, frameText: t.design.frameDefault }));
   const [candidate, setCandidate] = useState(initialCandidate);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,25 +46,19 @@ export function Generator({ origin, candidate: initialCandidate }: { origin: str
     e.preventDefault();
     if (busy) return;
     if (!target) {
-      setError(raw.trim() ? "Ez nem tűnik érvényes webcímnek. Például: pelda.hu/menu" : "Add meg a linket, ahová a kód vezessen.");
+      setError(errorText(raw.trim() ? "invalid_url" : "missing_target"));
       shake.start({ x: [0, -10, 9, -6, 4, 0], transition: { duration: 0.45 } });
       return;
     }
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch("/api/codes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target, title, design, proposedId: candidate }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Nem sikerült létrehozni a kódot.");
+      const json = await api<{ id: string; token: string }>("/api/codes", "POST", { target, title, design, proposedId: candidate });
       rememberCode({ id: json.id, token: json.token, title: title.trim(), createdAt: Date.now() });
       created.current = true;
-      router.push(`/kezeles/${json.token}?uj=1`);
+      router.push(l(`/manage/${json.token}?new=1`));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nem sikerült létrehozni a kódot.");
+      setError(errorText(errorCode(err)));
       setBusy(false);
     }
   }
@@ -71,12 +71,12 @@ export function Generator({ origin, candidate: initialCandidate }: { origin: str
     >
       {/* 1. Cél */}
       <div className="[grid-area:input]">
-        <Step n={1} title="Hová vezessen a kód?" />
+        <Step n={1} title={G.step1} />
         <motion.div animate={shake} className="relative mt-4">
           <IconLink className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted" />
           <input
             className={`field py-4 pl-12 text-base ${error ? "border-coral focus:border-coral" : ""}`}
-            placeholder="pelda.hu/menu"
+            placeholder={G.urlPlaceholder}
             inputMode="url"
             autoComplete="url"
             spellCheck={false}
@@ -85,7 +85,7 @@ export function Generator({ origin, candidate: initialCandidate }: { origin: str
               setRaw(e.target.value);
               if (error) setError(null);
             }}
-            aria-label="Cél webcím"
+            aria-label={G.urlLabel}
             aria-invalid={!!error}
           />
           <AnimatePresence>
@@ -117,11 +117,11 @@ export function Generator({ origin, candidate: initialCandidate }: { origin: str
         </AnimatePresence>
         <input
           className="field mt-3"
-          placeholder="Megnevezés – csak te látod (pl. Étlap az asztalokon)"
+          placeholder={G.titlePlaceholder}
           maxLength={60}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          aria-label="Megnevezés"
+          aria-label={G.titleLabel}
         />
       </div>
 
@@ -132,17 +132,17 @@ export function Generator({ origin, candidate: initialCandidate }: { origin: str
             <div className="pointer-events-none absolute -top-16 -right-10 size-48 rounded-full bg-lime/40 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-20 -left-16 size-56 rounded-full bg-sky/50 blur-3xl" />
             <QrStage text={shortUrl} design={design} className="relative mx-auto w-full max-w-[250px] sm:max-w-[320px]" />
-            <Connector short={shortUrl.replace(/^https?:\/\//, "")} target={target} />
+            <Connector short={shortUrl.replace(/^https?:\/\//, "")} target={target} placeholder={G.yourLink} />
           </div>
           <p className="mt-3 px-1 text-center text-[13px] leading-relaxed text-muted">
-            A kód a rövid linkedet tartalmazza, ezért a célt később bármikor átírhatod — a kinyomtatott kód marad.
+            {G.hint}
           </p>
         </div>
       </div>
 
       {/* 2. Megjelenés */}
       <div className="[grid-area:design]">
-        <Step n={2} title="Szabd a saját stílusodra" />
+        <Step n={2} title={G.step2} />
         <div className="mt-4">
           <DesignControls design={design} onChange={setDesign} />
         </div>
@@ -153,21 +153,24 @@ export function Generator({ origin, candidate: initialCandidate }: { origin: str
         <button type="submit" className="btn btn-primary w-full py-4 text-base sm:text-lg" disabled={busy}>
           {busy ? (
             <>
-              <Spinner /> Kód készül…
+              <Spinner /> {G.creating}
             </>
           ) : (
             <>
-              QR-kód létrehozása ingyen <IconArrowRight className="size-5" />
+              {G.submit} <IconArrowRight className="size-5" />
             </>
           )}
         </button>
         <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-[13px] text-ink-2">
-          {["30 napig ingyen", "Nem kérünk kártyát", "Utána 1 $/hó, bármikor lemondható"].map((t) => (
-            <li key={t} className="flex items-center gap-1.5">
-              <IconCheck className="size-3.5 text-kobalt" strokeWidth={3} /> {t}
+          {G.perks.map((perk) => (
+            <li key={perk} className="flex items-center gap-1.5">
+              <IconCheck className="size-3.5 text-kobalt" strokeWidth={3} /> {perk}
             </li>
           ))}
         </ul>
+        <p className="mt-3 text-center text-[12px] leading-relaxed text-muted">
+          <Rich text={G.consent} links={{ terms: l("/terms"), privacy: l("/privacy") }} linkClass="underline underline-offset-2 hover:text-ink" />
+        </p>
       </div>
     </form>
   );
@@ -198,7 +201,7 @@ function Spinner() {
 }
 
 /** Rövid link → cél: a „dinamikus” lényeg egy pillantásra. */
-function Connector({ short, target }: { short: string; target: string | null }) {
+function Connector({ short, target, placeholder }: { short: string; target: string | null; placeholder: string }) {
   const host = target ? new URL(target).hostname.replace(/^www\./, "") : null;
   return (
     <div className="relative mt-6 flex flex-col items-center gap-1.5 text-[13px] sm:flex-row sm:gap-2">
@@ -221,7 +224,7 @@ function Connector({ short, target }: { short: string; target: string | null }) 
             transition={{ duration: 0.25 }}
             className={`block truncate ${target ? "text-ink" : "text-muted"}`}
           >
-            {target ? prettyUrl(target) : "a te linked"}
+            {target ? prettyUrl(target) : placeholder}
           </motion.span>
         </AnimatePresence>
       </span>

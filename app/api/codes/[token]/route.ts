@@ -6,7 +6,7 @@ import { cleanTitle, deleteCode, getByToken, toView, updateCode } from "@/lib/se
 import { originOf } from "@/lib/server/request";
 import { readJson, validTarget } from "@/lib/server/validate";
 
-const notFound = () => NextResponse.json({ error: "Ez a kód nem létezik, vagy törölték." }, { status: 404 });
+const notFound = () => NextResponse.json({ error: "not_found" }, { status: 404 });
 
 export async function GET(_req: Request, ctx: RouteContext<"/api/codes/[token]">) {
   const { token } = await ctx.params;
@@ -37,10 +37,7 @@ export async function DELETE(_req: Request, ctx: RouteContext<"/api/codes/[token
   try {
     await cancelImmediately(row);
   } catch {
-    return NextResponse.json(
-      { error: "Az előfizetést nem sikerült leállítani, ezért a kódot sem töröltük. Próbáld újra később." },
-      { status: 502 },
-    );
+    return NextResponse.json({ error: "delete_failed" }, { status: 502 });
   }
   await deleteCode(row.id);
   return NextResponse.json({ ok: true });

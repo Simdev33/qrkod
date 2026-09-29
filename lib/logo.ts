@@ -3,16 +3,16 @@ import { LOGO_MAX_CHARS } from "./design";
 /** Feltöltött képből kicsinyített, négyzetbe illesztett PNG (vagy ha túl nagy, WebP) data URL. */
 export async function processLogo(file: File): Promise<string> {
   if (!/^image\/(png|jpeg|webp|svg\+xml|gif)$/.test(file.type)) {
-    throw new Error("PNG, JPG, WebP vagy SVG képet tölts fel.");
+    throw new Error("logo_type");
   }
-  if (file.size > 8 * 1024 * 1024) throw new Error("A kép legfeljebb 8 MB lehet.");
+  if (file.size > 8 * 1024 * 1024) throw new Error("logo_size");
 
   const url = URL.createObjectURL(file);
   try {
     const img = new Image();
     await new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
-      img.onerror = () => reject(new Error("Ezt a képet nem sikerült beolvasni."));
+      img.onerror = () => reject(new Error("logo_read"));
       img.src = url;
     });
     for (const size of [256, 200, 160]) {
@@ -30,7 +30,7 @@ export async function processLogo(file: File): Promise<string> {
         if (data.startsWith(`data:${type}`) && data.length <= LOGO_MAX_CHARS) return data;
       }
     }
-    throw new Error("A kép túl részletes, próbálj egy egyszerűbb logót.");
+    throw new Error("logo_complex");
   } finally {
     URL.revokeObjectURL(url);
   }

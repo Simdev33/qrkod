@@ -3,12 +3,17 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { IconExternal, IconLink, IconPencil } from "@/components/ui/Icons";
-import { api } from "@/lib/api";
+import { api, errorCode } from "@/lib/api";
 import { normalizeUrl, prettyUrl } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
 import type { CodeView } from "@/lib/types";
 import type { Notify } from "./ManageView";
 
 export function TargetCard({ code, onUpdate, notify }: { code: CodeView; onUpdate: (c: CodeView) => void; notify: Notify }) {
+  const i18n = useI18n();
+  const t = i18n.t.manage.target;
+  const common = i18n.t.common;
+  const errorText = i18n.error;
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(code.target);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +23,7 @@ export function TargetCard({ code, onUpdate, notify }: { code: CodeView; onUpdat
     e.preventDefault();
     const url = normalizeUrl(value);
     if (!url) {
-      setError("Ez nem tűnik érvényes webcímnek. Például: pelda.hu/menu");
+      setError(errorText("invalid_url"));
       return;
     }
     setBusy(true);
@@ -27,9 +32,9 @@ export function TargetCard({ code, onUpdate, notify }: { code: CodeView; onUpdat
       onUpdate(next);
       setEditing(false);
       setError(null);
-      notify("Cél átírva – a kód mostantól ide visz. Újranyomtatni nem kell.");
+      notify(t.saved);
     } catch (err) {
-      setError((err as Error).message);
+      setError(errorText(errorCode(err)));
     }
     setBusy(false);
   }
@@ -38,7 +43,7 @@ export function TargetCard({ code, onUpdate, notify }: { code: CodeView; onUpdat
     <div className="card p-6 sm:p-7">
       <div className="flex items-center justify-between gap-4">
         <h2 className="flex items-center gap-2.5 text-lg font-semibold tracking-tight">
-          <IconLink className="size-5 text-kobalt" /> Hová visz a kód?
+          <IconLink className="size-5 text-kobalt" /> {t.title}
         </h2>
         {!editing && (
           <button
@@ -49,7 +54,7 @@ export function TargetCard({ code, onUpdate, notify }: { code: CodeView; onUpdat
               setEditing(true);
             }}
           >
-            <IconPencil className="size-4" /> Átírás
+            <IconPencil className="size-4" /> {t.edit}
           </button>
         )}
       </div>
@@ -76,15 +81,15 @@ export function TargetCard({ code, onUpdate, notify }: { code: CodeView; onUpdat
                 setValue(e.target.value);
                 setError(null);
               }}
-              aria-label="Új cél webcím"
+              aria-label={t.newLabel}
             />
             {error && <p className="mt-2 text-sm font-medium text-coral-deep">{error}</p>}
             <div className="mt-3 flex gap-2">
               <button type="submit" className="btn btn-primary" disabled={busy}>
-                {busy ? "Mentés…" : "Cél mentése"}
+                {busy ? t.saving : t.save}
               </button>
               <button type="button" className="btn btn-ghost" onClick={() => setEditing(false)}>
-                Mégse
+                {common.cancel}
               </button>
             </div>
           </motion.form>
@@ -105,7 +110,7 @@ export function TargetCard({ code, onUpdate, notify }: { code: CodeView; onUpdat
           </motion.a>
         )}
       </AnimatePresence>
-      <p className="mt-3 text-[13px] leading-relaxed text-muted">A célt bármikor, akárhányszor átírhatod – a kinyomtatott kód ugyanaz marad.</p>
+      <p className="mt-3 text-[13px] leading-relaxed text-muted">{t.hint}</p>
     </div>
   );
 }

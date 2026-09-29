@@ -15,29 +15,21 @@ export type Design = {
   frameText: string;
 };
 
-export const DOT_STYLES: { id: DotStyle; label: string }[] = [
-  { id: "square", label: "Négyzet" },
-  { id: "rounded", label: "Lekerekített" },
-  { id: "dots", label: "Pötty" },
-  { id: "liquid", label: "Folyékony" },
-];
+// A stílusok és színpárosítások neve a szótárban van (design.dots / design.eyes / design.palettes).
+export const DOT_STYLES: DotStyle[] = ["square", "rounded", "dots", "liquid"];
+export const EYE_STYLES: EyeStyle[] = ["square", "rounded", "circle", "leaf"];
 
-export const EYE_STYLES: { id: EyeStyle; label: string }[] = [
-  { id: "square", label: "Szögletes" },
-  { id: "rounded", label: "Kerek sarok" },
-  { id: "circle", label: "Kör" },
-  { id: "leaf", label: "Levél" },
-];
+export type PaletteId = "tinta" | "kobalt" | "korall" | "erdo" | "szilva" | "tenger" | "kave" | "citrom";
 
-export const PALETTES: { id: string; label: string; fg: string; eye: string; bg: string }[] = [
-  { id: "tinta", label: "Tinta", fg: "#16161d", eye: "#16161d", bg: "#ffffff" },
-  { id: "kobalt", label: "Kobalt", fg: "#1f2fd1", eye: "#16161d", bg: "#ffffff" },
-  { id: "korall", label: "Korall", fg: "#16161d", eye: "#e8452a", bg: "#fff6f0" },
-  { id: "erdo", label: "Erdő", fg: "#17402e", eye: "#2c8a5e", bg: "#f4fbef" },
-  { id: "szilva", label: "Szilva", fg: "#3b1a5c", eye: "#8a3ffc", bg: "#faf6ff" },
-  { id: "tenger", label: "Tenger", fg: "#0c3b5e", eye: "#0a84c6", bg: "#f1f8ff" },
-  { id: "kave", label: "Kávé", fg: "#3a2519", eye: "#9a5b2e", bg: "#fbf5ec" },
-  { id: "citrom", label: "Citrom", fg: "#1c1c12", eye: "#1c1c12", bg: "#f3ff9e" },
+export const PALETTES: { id: PaletteId; fg: string; eye: string; bg: string }[] = [
+  { id: "tinta", fg: "#16161d", eye: "#16161d", bg: "#ffffff" },
+  { id: "kobalt", fg: "#1f2fd1", eye: "#16161d", bg: "#ffffff" },
+  { id: "korall", fg: "#16161d", eye: "#e8452a", bg: "#fff6f0" },
+  { id: "erdo", fg: "#17402e", eye: "#2c8a5e", bg: "#f4fbef" },
+  { id: "szilva", fg: "#3b1a5c", eye: "#8a3ffc", bg: "#faf6ff" },
+  { id: "tenger", fg: "#0c3b5e", eye: "#0a84c6", bg: "#f1f8ff" },
+  { id: "kave", fg: "#3a2519", eye: "#9a5b2e", bg: "#fbf5ec" },
+  { id: "citrom", fg: "#1c1c12", eye: "#1c1c12", bg: "#f3ff9e" },
 ];
 
 export const DEFAULT_DESIGN: Design = {
@@ -61,8 +53,8 @@ const hex = (v: unknown, fallback: string) => (typeof v === "string" && HEX.test
 /** Ismeretlen bemenetből érvényes dizájn — a szerver ezzel szűr minden mentés előtt. */
 export function sanitizeDesign(input: unknown): Design {
   const d = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
-  const dots = DOT_STYLES.some((s) => s.id === d.dots) ? (d.dots as DotStyle) : DEFAULT_DESIGN.dots;
-  const eyes = EYE_STYLES.some((s) => s.id === d.eyes) ? (d.eyes as EyeStyle) : DEFAULT_DESIGN.eyes;
+  const dots = DOT_STYLES.includes(d.dots as DotStyle) ? (d.dots as DotStyle) : DEFAULT_DESIGN.dots;
+  const eyes = EYE_STYLES.includes(d.eyes as EyeStyle) ? (d.eyes as EyeStyle) : DEFAULT_DESIGN.eyes;
   const logo =
     typeof d.logo === "string" &&
     d.logo.length <= LOGO_MAX_CHARS &&

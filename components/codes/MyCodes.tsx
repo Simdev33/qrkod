@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { QrCode } from "@/components/qr/QrCode";
 import { IconArrowRight, IconPlus, IconScan } from "@/components/ui/Icons";
-import { api } from "@/lib/api";
-import { fmtDate, fmtNumber, prettyUrl } from "@/lib/format";
+import { api, errorCode } from "@/lib/api";
+import { prettyUrl } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
 import { TOKEN_RE } from "@/lib/ids";
 import { forgetCode, onLocalCodesChange, readLocalCodes, rememberCode } from "@/lib/local-codes";
-import { lifeStatus, PHASE_LABEL, type Phase } from "@/lib/status";
+import { lifeStatus, type Phase } from "@/lib/status";
 import type { CodeView } from "@/lib/types";
 
 type State = { loading: true } | { loading: false; codes: CodeView[]; now: number };
@@ -34,6 +35,8 @@ async function load(): Promise<{ codes: CodeView[]; now: number }> {
 }
 
 export function MyCodes({ origin, deleted }: { origin: string; deleted: boolean }) {
+  const { t, l } = useI18n();
+  const M = t.myCodes;
   const [state, setState] = useState<State>({ loading: true });
   const [version, setVersion] = useState(0);
 
@@ -59,14 +62,12 @@ export function MyCodes({ origin, deleted }: { origin: string; deleted: boolean 
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            Kódjaim
+            {M.title}
           </motion.h1>
-          <p className="mt-3 max-w-xl text-muted">
-            Az ezen az eszközön készített vagy megnyitott kódok. Másik eszközön a kezelőlinkkel éred el őket.
-          </p>
+          <p className="mt-3 max-w-xl text-muted">{M.lead}</p>
         </div>
-        <Link href="/#keszito" className="btn btn-lime">
-          <IconPlus className="size-5" /> Új QR-kód
+        <Link href={l("/#create")} className="btn btn-lime">
+          <IconPlus className="size-5" /> {M.newCode}
         </Link>
       </div>
 
@@ -77,7 +78,7 @@ export function MyCodes({ origin, deleted }: { origin: string; deleted: boolean 
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 rounded-2xl bg-ink px-5 py-3 text-paper"
           >
-            A kódot töröltük.
+            {M.deleted}
           </motion.p>
         )}
       </AnimatePresence>
@@ -106,6 +107,8 @@ export function MyCodes({ origin, deleted }: { origin: string; deleted: boolean 
 }
 
 function CodeCard({ code, now, origin, index }: { code: CodeView; now: number; origin: string; index: number }) {
+  const { t, l, fill, plural, date } = useI18n();
+  const M = t.myCodes;
   const s = lifeStatus(code, now);
   return (
     <motion.div
@@ -113,26 +116,26 @@ function CodeCard({ code, now, origin, index }: { code: CodeView; now: number; o
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay: Math.min(index, 8) * 0.06, ease: [0.16, 1, 0.3, 1] }}
     >
-      <Link href={`/kezeles/${code.token}`} className="card group flex h-full gap-4 p-4 transition-transform duration-300 hover:-translate-y-1">
+      <Link href={l(`/manage/${code.token}`)} className="card group flex h-full gap-4 p-4 transition-transform duration-300 hover:-translate-y-1">
         <div className={`w-[92px] shrink-0 self-start overflow-hidden rounded-2xl ring-1 ring-ink/10 ${s.alive ? "" : "opacity-50 grayscale"}`}>
           <QrCode text={`${origin}/q/${code.id}`} design={code.design} animate={false} className="block h-auto w-full" />
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <span className={`self-start rounded-full px-2.5 py-1 text-[12px] font-semibold ${TONE[s.phase]}`}>
-            {PHASE_LABEL[s.phase]}
-            {s.alive && s.phase !== "active" && s.phase !== "scheduled" ? ` · ${s.daysLeft} nap` : ""}
+            {t.status[s.phase]}
+            {s.alive && s.phase !== "active" && s.phase !== "scheduled" ? ` · ${plural(M.daysLeft, s.daysLeft)}` : ""}
           </span>
-          <div className="mt-2 truncate text-[17px] font-semibold tracking-tight">{code.title || "Névtelen QR-kód"}</div>
+          <div className="mt-2 truncate text-[17px] font-semibold tracking-tight">{code.title || t.manage.untitled}</div>
           <div className="truncate font-mono text-[13px] text-muted">{prettyUrl(code.target)}</div>
           <div className="mt-auto flex items-center justify-between pt-3 text-[13px] text-muted">
             <span className="flex items-center gap-1.5">
-              <IconScan className="size-4" /> {fmtNumber(code.scans)} beolvasás
+              <IconScan className="size-4" /> {plural(M.scans, code.scans)}
             </span>
             <span className="flex items-center gap-1 font-medium text-ink opacity-0 transition-opacity group-hover:opacity-100">
-              Kezelés <IconArrowRight className="size-4" />
+              {M.manage} <IconArrowRight className="size-4" />
             </span>
           </div>
-          <div className="sr-only">Létrehozva: {fmtDate(code.createdAt)}</div>
+          <div className="sr-only">{fill(M.created, { date: date(code.createdAt) })}</div>
         </div>
       </Link>
     </motion.div>
@@ -140,6 +143,8 @@ function CodeCard({ code, now, origin, index }: { code: CodeView; now: number; o
 }
 
 function Empty() {
+  const { t, l } = useI18n();
+  const M = t.myCodes;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -156,24 +161,27 @@ function Empty() {
           />
         ))}
       </div>
-      <h2 className="display mt-7 text-2xl">Még nincs itt kódod</h2>
-      <p className="mt-2 max-w-md text-muted">Készítsd el az elsőt – 30 napig ingyen működik, regisztráció nélkül.</p>
-      <Link href="/#keszito" className="btn btn-primary mt-7">
-        QR-kód készítése <IconArrowRight className="size-5" />
+      <h2 className="display mt-7 text-2xl">{M.emptyTitle}</h2>
+      <p className="mt-2 max-w-md text-muted">{M.emptyText}</p>
+      <Link href={l("/#create")} className="btn btn-primary mt-7">
+        {M.emptyCta} <IconArrowRight className="size-5" />
       </Link>
     </motion.div>
   );
 }
 
 function AddByLink() {
+  const { t, error: errorText } = useI18n();
+  const M = t.myCodes;
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
-    const token = value.trim().split("/kezeles/")[1]?.split(/[?#/]/)[0] ?? value.trim();
+    // Új (/manage/…) és régi (/kezeles/…) kezelőlink is jó, ahogy a puszta token is.
+    const token = value.trim().split(/\/(?:manage|kezeles)\//)[1]?.split(/[?#/]/)[0] ?? value.trim();
     if (!TOKEN_RE.test(token)) {
-      setError("Ez nem kezelőlink. Így néz ki: …/kezeles/Xk2…");
+      setError(M.notManageLink);
       return;
     }
     try {
@@ -182,27 +190,27 @@ function AddByLink() {
       setValue("");
       setError(null);
     } catch (err) {
-      setError((err as Error).message);
+      setError(errorText(errorCode(err)));
     }
   }
 
   return (
     <form onSubmit={add} className="mt-12 rounded-[28px] border border-dashed border-ink/20 p-6 sm:p-7">
-      <h2 className="font-semibold tracking-tight">Másik eszközön készült kód hozzáadása</h2>
-      <p className="mt-1 text-[14px] text-muted">Illeszd be a kezelőlinket, és a kód megjelenik ebben a listában.</p>
+      <h2 className="font-semibold tracking-tight">{M.addTitle}</h2>
+      <p className="mt-1 text-[14px] text-muted">{M.addText}</p>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input
           className="field font-mono text-sm"
-          placeholder="https://…/kezeles/…"
+          placeholder="https://…/manage/…"
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
             setError(null);
           }}
-          aria-label="Kezelőlink"
+          aria-label={M.addLabel}
         />
         <button type="submit" className="btn btn-ink">
-          Hozzáadás
+          {M.add}
         </button>
       </div>
       {error && <p className="mt-2 text-sm font-medium text-coral-deep">{error}</p>}
