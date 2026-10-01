@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useState, type FormEvent } from "react";
+import { useState, useSyncExternalStore, type FormEvent } from "react";
 import { IconCheck, IconLock, IconShield } from "@/components/ui/Icons";
 import { Rich } from "@/components/ui/Rich";
 import { api, ApiError, errorCode } from "@/lib/api";
@@ -19,6 +19,8 @@ const savedEmail = () => {
     return "";
   }
 };
+
+const noSubscription = () => () => {};
 
 type Step = { kind: "email" } | { kind: "pay"; clientSecret: string; email: string };
 
@@ -45,7 +47,10 @@ export function PaymentPanel({
   const { t, l, lang, fill, money, error: errorText } = useI18n();
   const P = t.manage.paywall;
   const [step, setStep] = useState<Step>({ kind: "email" });
-  const [email, setEmail] = useState(savedEmail);
+  // The remembered address is read after hydration (the server cannot see it); typing replaces it.
+  const remembered = useSyncExternalStore(noSubscription, savedEmail, () => "");
+  const [typed, setEmail] = useState<string | null>(null);
+  const email = typed ?? remembered;
   const [consent, setConsent] = useState(false);
   const [consentWarning, setConsentWarning] = useState(false);
   const [busy, setBusy] = useState(false);

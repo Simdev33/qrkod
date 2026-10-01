@@ -55,7 +55,7 @@ const fr: Dictionary = {
     line1: "Imprimez-le une fois,",
     line2: "redirigez-le",
     line2Mark: "à tout moment.",
-    lead: "Créez un QR code en quelques secondes. <b>Les {days} premiers jours coûtent {intro}</b>, puis il reste actif pour <b>{monthly} par mois</b> — et vous pouvez changer le lien qui se cache derrière quand vous voulez.",
+    lead: "Créez un QR code en quelques secondes. <b>Testez-le {days} jours pour seulement {intro}</b> – ensuite, il coûte {monthly} par mois, et vous pouvez changer le lien qui se cache derrière quand vous voulez.",
   },
 
   generator: {
@@ -165,7 +165,7 @@ const fr: Dictionary = {
 
   life: {
     eyebrow: "Comment fonctionne le tarif",
-    title: "{intro} la première semaine.",
+    title: "Seulement {intro} la première semaine.",
     titleMark: "Puis {monthly} par mois.",
     lead: "Pas de frais cachés : vous ne payez que pour les codes que vous gardez actifs. Résiliable à tout moment – le code se met simplement en pause, et vous pourrez le réactiver plus tard.",
     born: {
@@ -182,8 +182,8 @@ const fr: Dictionary = {
     },
     paid: {
       chip: "Dès le jour {next}",
-      title: "{monthly} par mois",
-      text: "L’abonnement se renouvelle chaque mois. Résiliable en un clic – sans engagement.",
+      title: "Puis chaque mois",
+      text: "{monthly} par mois et par code. Résiliable en un clic – sans engagement.",
       unit: "€",
     },
     branch: {
@@ -195,7 +195,7 @@ const fr: Dictionary = {
 
   features: {
     eyebrow: "Tout est inclus",
-    title: "Aucun compromis, même à {monthly} par mois.",
+    title: "Tout est inclus – dès {intro}.",
     style: {
       title: "Votre style, votre logo",
       text: "Quatre motifs de points, quatre styles de repères d’angle, vos propres couleurs, un logo au centre et un cadre avec texte. Nous vous alertons si le contraste est faible, pour que le code reste toujours lisible.",
@@ -222,10 +222,10 @@ const fr: Dictionary = {
     eyebrow: "Tarifs",
     title: "Un code.",
     titleAccent: "Un prix tout simple.",
-    trialBadge: "Les {days} premiers jours pour {intro}",
-    perMonth: "/ mois",
+    trialBadge: "Offre de découverte",
+    perMonth: "/ {days} premiers jours",
     perCode: "/ QR code",
-    lead: "Chaque code démarre par une semaine de découverte de {days} jours pour {intro}. À partir du jour {next}, il coûte {monthly} par mois – résiliez avant et vous ne serez plus prélevé.",
+    lead: "Testez toutes les fonctionnalités pendant {days} jours pour seulement {intro}. Ensuite, le code reste actif pour {monthly} par mois – résiliez avant le jour {next} et vous ne serez plus prélevé.",
     included: [
       "Scans illimités",
       "Destination modifiable à tout moment",
@@ -240,8 +240,8 @@ const fr: Dictionary = {
       lead: "Chaque code est facturé séparément – vous ne payez que pour ceux que vous gardez actifs.",
       unit: "QR codes",
       slider: "Nombre de QR codes",
-      monthly: "Par mois",
-      yearly: "Par an",
+      monthly: "Aujourd’hui – {days} premiers jours",
+      yearly: "Ensuite {amount} par mois pour ces codes.",
       note: "Chaque code démarre par une semaine de découverte de {days} jours pour {intro}.",
     },
   },

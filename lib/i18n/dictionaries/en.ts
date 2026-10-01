@@ -62,7 +62,7 @@ const en = {
     line1: "Print it once,",
     line2: "redirect it",
     line2Mark: "anytime.",
-    lead: "Create a QR code in seconds. <b>The first {days} days cost {intro}</b>, then it stays live for <b>{monthly} a month</b> — and you can change the link behind it whenever you like.",
+    lead: "Create a QR code in seconds. <b>Try it for {days} days for just {intro}</b> – after that it’s {monthly} a month, and you can change the link behind it whenever you like.",
   },
 
   generator: {
@@ -171,7 +171,7 @@ const en = {
 
   life: {
     eyebrow: "How pricing works",
-    title: "{intro} for the first week.",
+    title: "Just {intro} for the first week.",
     titleMark: "Then {monthly} a month.",
     lead: "No hidden fees: you only pay for the codes you keep live. Cancel anytime – the code simply pauses, and you can reactivate it later.",
     born: { chip: "Day 0", title: "Create and activate", text: "Design your code, activate it for {intro} and download it right away." },
@@ -184,8 +184,8 @@ const en = {
     },
     paid: {
       chip: "From day {next}",
-      title: "{monthly} a month",
-      text: "The subscription renews every month. Cancel in one click – no lock-in.",
+      title: "Then it renews monthly",
+      text: "{monthly} a month per code. Cancel in one click – no lock-in.",
       unit: "€",
     },
     branch: {
@@ -197,7 +197,7 @@ const en = {
 
   features: {
     eyebrow: "Everything included",
-    title: "No compromises, even at {monthly} a month.",
+    title: "Everything included – from just {intro}.",
     style: {
       title: "Your style, your logo",
       text: "Four dot patterns, four corner styles, custom colours, a logo in the middle and a frame with a label. We warn you about low contrast, so the code always stays scannable.",
@@ -221,10 +221,10 @@ const en = {
     eyebrow: "Pricing",
     title: "One code.",
     titleAccent: "One simple price.",
-    trialBadge: "First {days} days for {intro}",
-    perMonth: "/ month",
+    trialBadge: "Intro offer",
+    perMonth: "/ first {days} days",
     perCode: "/ QR code",
-    lead: "Every code starts with a {days}-day intro week for {intro}. From day {next}, it costs {monthly} a month – cancel before then and you won’t be charged again.",
+    lead: "Try every feature for {days} days for just {intro}. After that the code stays live for {monthly} a month – cancel before day {next} and you won’t be charged again.",
     included: [
       "Unlimited scans",
       "Change the destination anytime",
@@ -239,8 +239,8 @@ const en = {
       lead: "Every code is billed on its own – you only pay for the ones you keep live.",
       unit: "QR codes",
       slider: "Number of QR codes",
-      monthly: "Per month",
-      yearly: "Per year",
+      monthly: "Today – first {days} days",
+      yearly: "Then {amount} a month for these codes.",
       note: "Each code starts with a {days}-day intro week for {intro}.",
     },
   },

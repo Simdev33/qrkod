@@ -30,9 +30,9 @@ export function Pricing() {
             <div className="relative">
               <span className="rounded-full bg-lime px-3 py-1 text-[13px] font-bold">{fill(P.trialBadge)}</span>
               <div className="mt-6 flex items-end gap-3">
-                <span className="display text-[clamp(5rem,14vw,8.5rem)] leading-[0.8]">{money(PLAN.monthlyCents)}</span>
+                <span className="display text-[clamp(5rem,14vw,8.5rem)] leading-[0.8]">{money(PLAN.introCents)}</span>
                 <span className="pb-2 text-lg leading-tight text-muted">
-                  {P.perMonth}
+                  {fill(P.perMonth)}
                   <br />
                   {P.perCode}
                 </span>
@@ -69,8 +69,8 @@ function Calculator() {
   const C = t.pricing.calc;
   const [n, setN] = useState(5);
   const monthly = useMotionValue(n);
-  const monthlyText = useTransform(monthly, (v) => money(Math.round(v) * PLAN.monthlyCents));
-  const yearlyText = useTransform(monthly, (v) => money(Math.round(v) * PLAN.monthlyCents * 12));
+  // Highlighted: what the codes cost today (the intro fee); the monthly fee afterwards is plain text.
+  const todayText = useTransform(monthly, (v) => money(Math.round(v) * PLAN.introCents));
 
   useEffect(() => {
     const c = animate(monthly, n, { duration: 0.5, ease: [0.16, 1, 0.3, 1] });
@@ -97,17 +97,14 @@ function Calculator() {
         style={{ background: `linear-gradient(to right, var(--color-lime) ${((n - 1) / 49) * 100}%, rgb(243 240 232 / 0.15) 0)` }}
       />
 
-      <div className="mt-auto grid grid-cols-2 gap-3 pt-10">
-        <div className="rounded-2xl bg-paper/8 p-4 ring-1 ring-paper/10">
-          <div className="text-[13px] text-paper/55">{C.monthly}</div>
-          <motion.div className="display mt-1 text-3xl">{monthlyText}</motion.div>
+      <div className="mt-auto pt-10">
+        <div className="rounded-2xl bg-paper/8 p-5 ring-1 ring-paper/10">
+          <div className="text-[13px] text-paper/55">{fill(C.monthly)}</div>
+          <motion.div className="display mt-1 text-5xl text-lime">{todayText}</motion.div>
         </div>
-        <div className="rounded-2xl bg-paper/8 p-4 ring-1 ring-paper/10">
-          <div className="text-[13px] text-paper/55">{C.yearly}</div>
-          <motion.div className="display mt-1 text-3xl">{yearlyText}</motion.div>
-        </div>
+        <p className="mt-3 text-[13px] text-paper/55">{fill(C.yearly, { amount: money(n * PLAN.monthlyCents) })}</p>
       </div>
-      <p className="mt-4 text-[13px] text-paper/50">{fill(C.note)}</p>
+      <p className="mt-1 text-[13px] text-paper/40">{fill(C.note)}</p>
     </div>
   );
 }

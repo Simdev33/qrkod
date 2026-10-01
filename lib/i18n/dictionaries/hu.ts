@@ -55,7 +55,7 @@ const hu: Dictionary = {
     line1: "Nyomtasd ki egyszer,",
     line2: "irányítsd",
     line2Mark: "bármikor.",
-    lead: "Készíts QR-kódot pár másodperc alatt. <b>Az első {days} nap díja {intro}</b>, utána <b>havi {monthly} díjjal</b> él tovább — a mögötte lévő linket pedig bármikor átírhatod.",
+    lead: "Készíts QR-kódot pár másodperc alatt. <b>{days} napig mindössze {intro}</b> – utána havi {monthly}, a mögötte lévő linket pedig bármikor átírhatod.",
   },
 
   generator: {
@@ -165,7 +165,7 @@ const hu: Dictionary = {
 
   life: {
     eyebrow: "Így működik az árazás",
-    title: "Az első hét díja {intro}.",
+    title: "Az első hét mindössze {intro}.",
     titleMark: "Utána havi {monthly}.",
     lead: "Nincsenek rejtett díjak: csak azokért a kódokért fizetsz, amiket életben tartasz. Bármikor lemondhatod – a kód ilyenkor egyszerűen szünetel, és később újraaktiválhatod.",
     born: {
@@ -182,8 +182,8 @@ const hu: Dictionary = {
     },
     paid: {
       chip: "{next}. naptól",
-      title: "Havi {monthly}",
-      text: "Az előfizetés havonta megújul. Egy kattintással lemondható – nincs hűségidő.",
+      title: "Utána havonta megújul",
+      text: "Kódonként havi {monthly}. Egy kattintással lemondható – nincs hűségidő.",
       unit: "€",
     },
     branch: {
@@ -195,7 +195,7 @@ const hu: Dictionary = {
 
   features: {
     eyebrow: "Minden benne van",
-    title: "Havi {monthly} – kompromisszumok nélkül.",
+    title: "Minden benne van – az első hét csak {intro}.",
     style: {
       title: "Saját stílus, saját logó",
       text: "Négy pöttyminta, négyféle sarokjel, saját színek, logó a közepén és keret felirattal. Szólunk, ha gyenge a kontraszt, így a kód mindig beolvasható marad.",
@@ -219,10 +219,10 @@ const hu: Dictionary = {
     eyebrow: "Árazás",
     title: "Egy kód.",
     titleAccent: "Egy egyszerű ár.",
-    trialBadge: "Az első {days} nap: {intro}",
-    perMonth: "/ hó",
+    trialBadge: "Bevezető ajánlat",
+    perMonth: "/ első {days} nap",
     perCode: "/ QR-kód",
-    lead: "Minden kód egy {days} napos bevezető héttel indul, ennek díja {intro}. A {next}. naptól havi {monthly} – ha előtte lemondod, többet nem terhelünk.",
+    lead: "{days} napig minden funkciót kipróbálhatsz, mindössze {intro} díjért. Utána a kód havi {monthly} díjért él tovább – ha a {next}. nap előtt lemondod, többet nem terhelünk.",
     included: [
       "Korlátlan beolvasás",
       "A cél bármikor átírható",
@@ -237,8 +237,8 @@ const hu: Dictionary = {
       lead: "Minden kódot külön számlázunk – csak azokért fizetsz, amiket életben tartasz.",
       unit: "QR-kód",
       slider: "QR-kódok száma",
-      monthly: "Havonta",
-      yearly: "Évente",
+      monthly: "Ma – az első {days} nap",
+      yearly: "Utána ezekért a kódokért havonta: {amount}.",
       note: "Minden kód {days} napos bevezető héttel indul (díja: {intro}).",
     },
   },

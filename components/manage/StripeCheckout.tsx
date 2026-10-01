@@ -2,14 +2,14 @@
 
 import { CheckoutElementsProvider, ExpressCheckoutElement, PaymentElement, useCheckoutElements } from "@stripe/react-stripe-js/checkout";
 import { loadStripe, type Appearance, type Stripe, type StripeConstructorOptions } from "@stripe/stripe-js";
-import { motion } from "motion/react";
 import { useMemo, useState, type ReactNode } from "react";
-import { IconCard } from "@/components/ui/Icons";
+import { IconCard, IconLock } from "@/components/ui/Icons";
 import { useI18n } from "@/lib/i18n/client";
 import { INTL_LOCALE, type Locale } from "@/lib/i18n/config";
 
-// The payment form of a Checkout Session (ui_mode "elements") – the same as on GetProCV: express buttons
-// (Apple Pay, Google Pay, PayPal, Link) and the card form behind one button. Nothing works without consent.
+// The payment form of a Checkout Session (ui_mode "elements"): express buttons (Apple Pay, Google Pay, PayPal,
+// Link) and the card form, which is open from the start. The card can be typed in before the consent is given,
+// but nothing is charged without it.
 
 const stripes = new Map<string, Promise<Stripe | null>>();
 
@@ -75,7 +75,8 @@ function PaymentMethods({
   const state = useCheckoutElements();
   const { lang, t, fill } = useI18n();
   const P = t.manage.paywall;
-  const [cardOpen, setCardOpen] = useState(false);
+  // undefined: still loading; false: no express method on this device (the divider is hidden then).
+  const [express, setExpress] = useState<boolean>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -121,9 +122,9 @@ function PaymentMethods({
     <div className="space-y-3">
       {renderPrices(prices)}
 
-      <div className="relative">
+      <div className={`relative ${express === false ? "hidden" : ""}`}>
         {/* Express buttons cannot be held back, so they stay disabled until the consent is given. */}
-        <div className={`space-y-3 transition-opacity ${consent ? "" : "pointer-events-none opacity-45"}`} aria-disabled={!consent}>
+        <div className={`transition-opacity ${consent ? "" : "pointer-events-none opacity-45"}`} aria-disabled={!consent}>
           <ExpressCheckoutElement
             options={{
               buttonHeight: 48,
@@ -133,28 +134,33 @@ function PaymentMethods({
               layout: { maxColumns: 1, maxRows: 6, overflow: "never" },
               paymentMethodOrder: ["apple_pay", "google_pay", "paypal", "link"],
             }}
+            onReady={(event) => setExpress(!!event.availablePaymentMethods)}
             onConfirm={(event) => void confirm({ expressCheckoutConfirmEvent: event })}
           />
-          {cardOpen ? (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-3 rounded-2xl border border-ink/10 bg-white p-4"
-            >
-              <PaymentElement options={{ layout: "tabs" }} />
-              <button type="button" className="btn btn-primary w-full py-3.5" disabled={busy} onClick={() => void confirm()}>
-                {busy && <Spinner />}
-                {fill(P.pay, { amount: prices.today })}
-              </button>
-            </motion.div>
-          ) : (
-            <button type="button" className="btn btn-ink w-full py-3.5" onClick={() => setCardOpen(true)}>
-              <IconCard className="size-5" />
-              {P.card}
-            </button>
-          )}
         </div>
         {!consent && <button type="button" aria-label={P.consentNeeded} className="absolute inset-0 cursor-not-allowed" onClick={onConsentMissing} />}
+      </div>
+
+      {express && (
+        <div className="flex items-center gap-3 pt-1 text-[12px] font-medium text-muted">
+          <span className="h-px flex-1 bg-ink/10" />
+          <IconCard className="size-4" />
+          {P.card}
+          <span className="h-px flex-1 bg-ink/10" />
+        </div>
+      )}
+
+      <div className="space-y-3 rounded-2xl border border-ink/10 bg-white p-4">
+        <PaymentElement options={{ layout: "tabs" }} />
+        <button
+          type="button"
+          className={`btn btn-primary w-full py-3.5 transition-opacity ${consent ? "" : "opacity-60"}`}
+          disabled={busy}
+          onClick={() => void confirm()}
+        >
+          {busy ? <Spinner /> : <IconLock className="size-4" />}
+          {fill(P.pay, { amount: prices.today })}
+        </button>
       </div>
 
       {busy && !error && (

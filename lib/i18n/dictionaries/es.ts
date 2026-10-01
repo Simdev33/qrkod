@@ -61,7 +61,7 @@ const es: Dictionary = {
     line1: "Imprímelo una vez,",
     line2: "redirígelo",
     line2Mark: "cuando quieras.",
-    lead: "Crea un código QR en segundos. <b>Los primeros {days} días cuestan {intro}</b> y después sigue activo por <b>{monthly} al mes</b>. Y puedes cambiar el enlace que hay detrás cuando quieras.",
+    lead: "Crea un código QR en segundos. <b>Pruébalo {days} días por solo {intro}</b>; después cuesta {monthly} al mes, y puedes cambiar el enlace que hay detrás cuando quieras.",
   },
 
   generator: {
@@ -171,7 +171,7 @@ const es: Dictionary = {
 
   life: {
     eyebrow: "Cómo funcionan los precios",
-    title: "{intro} la primera semana.",
+    title: "Solo {intro} la primera semana.",
     titleMark: "Luego {monthly} al mes.",
     lead: "Sin costes ocultos: solo pagas por los códigos que mantienes activos. Cancela cuando quieras: el código simplemente se pausa y puedes reactivarlo más adelante.",
     born: { chip: "Día 0", title: "Créalo y actívalo", text: "Diseña tu código, actívalo por {intro} y descárgalo al instante." },
@@ -184,8 +184,8 @@ const es: Dictionary = {
     },
     paid: {
       chip: "Desde el día {next}",
-      title: "{monthly} al mes",
-      text: "La suscripción se renueva cada mes. Cancela con un clic, sin permanencia.",
+      title: "Después, cada mes",
+      text: "{monthly} al mes por código. Cancela con un clic, sin permanencia.",
       unit: "€",
     },
     branch: {
@@ -197,7 +197,7 @@ const es: Dictionary = {
 
   features: {
     eyebrow: "Todo incluido",
-    title: "Por {monthly} al mes, sin renunciar a nada.",
+    title: "Todo incluido, desde solo {intro}.",
     style: {
       title: "Tu estilo, tu logo",
       text: "Cuatro patrones de puntos, cuatro tipos de esquinas, tus propios colores, logo en el centro y marco con texto. Te avisamos si el contraste es bajo para que siempre se pueda escanear.",
@@ -221,10 +221,10 @@ const es: Dictionary = {
     eyebrow: "Precios",
     title: "Un código.",
     titleAccent: "Un precio sencillo.",
-    trialBadge: "Los primeros {days} días por {intro}",
-    perMonth: "/ mes",
+    trialBadge: "Oferta de bienvenida",
+    perMonth: "/ primeros {days} días",
     perCode: "/ código QR",
-    lead: "Cada código empieza con una semana de prueba de {days} días por {intro}. Desde el día {next}, cuesta {monthly} al mes; si cancelas antes, no se te volverá a cobrar.",
+    lead: "Prueba todas las funciones durante {days} días por solo {intro}. Después, el código sigue activo por {monthly} al mes; si cancelas antes del día {next}, no se te volverá a cobrar.",
     included: [
       "Escaneos ilimitados",
       "Cambia el destino cuando quieras",
@@ -239,8 +239,8 @@ const es: Dictionary = {
       lead: "Cada código se factura por separado: solo pagas por los que mantienes activos.",
       unit: "códigos QR",
       slider: "Número de códigos QR",
-      monthly: "Al mes",
-      yearly: "Al año",
+      monthly: "Hoy: primeros {days} días",
+      yearly: "Después, {amount} al mes por estos códigos.",
       note: "Cada código empieza con una semana de prueba de {days} días por {intro}.",
     },
   },

@@ -27,7 +27,8 @@ export function Lifecycle() {
       <Reveal className="max-w-3xl">
         <span className="eyebrow">{L.eyebrow}</span>
         <h2 className="display mt-5 text-[clamp(2rem,4.6vw,3.6rem)] leading-[0.98]">
-          {fill(L.title)} <span className="marker">{fill(L.titleMark)}</span>
+          <span className="marker">{fill(L.title)}</span>
+          <span className="mt-3 block text-[0.5em] leading-tight text-muted">{fill(L.titleMark)}</span>
         </h2>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-2">
           {fill(L.lead)}
@@ -76,7 +77,7 @@ export function Lifecycle() {
           </Phase>
 
           {/* 31. naptól */}
-          <Phase chip={fill(L.paid.chip)} chipClass="bg-kobalt text-white" title={fill(L.paid.title)} text={L.paid.text}>
+          <Phase chip={fill(L.paid.chip)} chipClass="bg-kobalt text-white" title={fill(L.paid.title)} text={fill(L.paid.text)}>
             <div className="flex h-[132px] items-center">
               <div className="grid w-full grid-cols-7 items-center gap-1.5">
                 {Array.from({ length: MONTHS }, (_, i) => (
