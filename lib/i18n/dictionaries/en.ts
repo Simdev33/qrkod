@@ -333,8 +333,7 @@ const en = {
       ringPaused: "paused",
       ringPending: "not active",
       pendingHeading: "Activate your QR code",
-      pendingText:
-        "Your code is ready, but it doesn’t work yet. Activate it for {intro}: it works for {days} days, then {monthly} a month. Cancel anytime.",
+      pendingText: "Your code is ready, but it doesn’t work yet. Activate it for {intro}.",
       freeHeading: { one: "Free for {n} more day", other: "Free for {n} more days" },
       freeText: "Your free period ends on <b>{date}</b>. Subscribe to keep the code live without interruption.",
       introHeading: { one: "Intro week – {n} day left", other: "Intro week – {n} days left" },
@@ -364,7 +363,7 @@ const en = {
     paywall: {
       titleActivate: "Activate your QR code",
       titleReactivate: "Reactivate your QR code",
-      priceIntro: "First {days} days",
+      priceIntro: "Payment",
       priceMonthly: "Monthly",
       includes: "What you get:",
       features: [

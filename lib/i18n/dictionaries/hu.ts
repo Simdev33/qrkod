@@ -331,8 +331,7 @@ const hu: Dictionary = {
       ringPaused: "szünetel",
       ringPending: "nem aktív",
       pendingHeading: "Aktiváld a QR-kódodat",
-      pendingText:
-        "A kódod elkészült, de még nem működik. Az aktiválás díja {intro}: ezzel {days} napig működik, utána havi {monthly}. Bármikor lemondható.",
+      pendingText: "A kódod elkészült, de még nem működik. Aktiváld {intro} díjért.",
       freeHeading: { one: "Még {n} napig ingyenes", other: "Még {n} napig ingyenes" },
       freeText: "Az ingyenes időszak vége: <b>{date}</b>. Fizess elő, hogy a kód megszakítás nélkül működjön tovább.",
       introHeading: { one: "Bevezető hét – még {n} nap van hátra", other: "Bevezető hét – még {n} nap van hátra" },
@@ -362,7 +361,7 @@ const hu: Dictionary = {
     paywall: {
       titleActivate: "Aktiváld a QR-kódodat",
       titleReactivate: "Aktiváld újra a QR-kódodat",
-      priceIntro: "Az első {days} nap",
+      priceIntro: "Fizetés",
       priceMonthly: "Havonta",
       includes: "Amit kapsz:",
       features: [

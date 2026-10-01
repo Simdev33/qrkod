@@ -331,8 +331,7 @@ const de: Dictionary = {
       ringPaused: "pausiert",
       ringPending: "nicht aktiv",
       pendingHeading: "Aktiviere deinen QR-Code",
-      pendingText:
-        "Dein Code ist fertig, funktioniert aber noch nicht. Aktiviere ihn für {intro}: Er läuft {days} Tage, danach kostet er {monthly} im Monat. Jederzeit kündbar.",
+      pendingText: "Dein Code ist fertig, funktioniert aber noch nicht. Aktiviere ihn für {intro}.",
       freeHeading: { one: "Noch {n} Tag gratis", other: "Noch {n} Tage gratis" },
       freeText: "Dein Gratiszeitraum endet am <b>{date}</b>. Schließ ein Abo ab, damit der Code ohne Unterbrechung weiterläuft.",
       introHeading: { one: "Einführungswoche – noch {n} Tag", other: "Einführungswoche – noch {n} Tage" },
@@ -362,7 +361,7 @@ const de: Dictionary = {
     paywall: {
       titleActivate: "Aktiviere deinen QR-Code",
       titleReactivate: "Aktiviere deinen QR-Code wieder",
-      priceIntro: "Die ersten {days} Tage",
+      priceIntro: "Zahlung",
       priceMonthly: "Monatlich",
       includes: "Das bekommst du:",
       features: [
