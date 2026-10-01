@@ -5,8 +5,8 @@ import { paymentMode } from "./mode";
 import { sanitizeDesign, type Design } from "@/lib/design";
 import { dayKey } from "@/lib/format";
 import { CODE_RE, randomCode, randomToken } from "@/lib/ids";
-import { RETENTION_MONTHS } from "@/lib/legal";
-import { DAY, pricing } from "@/lib/site";
+import { PENDING_DAYS, RETENTION_MONTHS } from "@/lib/legal";
+import { DAY, FREE_DAYS } from "@/lib/site";
 import { lifeStatus } from "@/lib/status";
 import type { CodeView, SubStatus } from "@/lib/types";
 
@@ -129,7 +129,7 @@ export async function createCode(
     try {
       await run(
         "INSERT INTO codes (id, token, title, target, design, created_at, trial_ends_at, creator) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [id, token, input.title, input.target, JSON.stringify(input.design), now, now + pricing.trialDays * DAY, input.creator],
+        [id, token, input.title, input.target, JSON.stringify(input.design), now, now + FREE_DAYS * DAY, input.creator],
       );
       break;
     } catch (err) {
@@ -200,20 +200,24 @@ export async function shiftDays(id: string, days: number) {
   );
 }
 
-/* ---------------- Megőrzési idő ---------------- */
+/* ---------------- Retention ---------------- */
 
 const g = globalThis as unknown as { __kockakodPurgedAt?: number };
 
 /**
- * A megőrzési időn túl szünetelő kódok végleges törlése (Adatkezelési tájékoztató: {retentionMonths}
- * hónap). Példányonként legfeljebb 12 óránként fut le, a kódkészítés után a háttérben.
+ * Permanently deletes codes past their retention period (Privacy Policy): codes never activated after
+ * {pendingDays} days, paused codes {retentionMonths} months after they paused. Runs at most every 12 hours
+ * per instance, in the background after a code is created.
  */
 export async function purgeExpired(now = Date.now()) {
   if (g.__kockakodPurgedAt && now - g.__kockakodPurgedAt < 12 * 60 * 60 * 1000) return;
   g.__kockakodPurgedAt = now;
-  const cutoff = now - RETENTION_MONTHS * 30 * DAY;
-  const stale = `SELECT id FROM codes WHERE MAX(trial_ends_at, COALESCE(paid_until, 0)) < ?
-    AND (sub_status IS NULL OR sub_status NOT IN ('active', 'trialing', 'past_due'))`;
-  await run(`DELETE FROM scan_days WHERE code_id IN (${stale})`, [cutoff]);
-  await run(`DELETE FROM codes WHERE id IN (${stale})`, [cutoff]);
+  const notLive = "(sub_status IS NULL OR sub_status NOT IN ('active', 'trialing', 'past_due'))";
+  const stale = `SELECT id FROM codes WHERE ${notLive} AND (
+      (paid_until IS NULL AND trial_ends_at <= created_at AND created_at < ?)
+      OR MAX(trial_ends_at, COALESCE(paid_until, 0)) < ?
+    )`;
+  const args = [now - PENDING_DAYS * DAY, now - RETENTION_MONTHS * 30 * DAY];
+  await run(`DELETE FROM scan_days WHERE code_id IN (${stale})`, args);
+  await run(`DELETE FROM codes WHERE id IN (${stale})`, args);
 }

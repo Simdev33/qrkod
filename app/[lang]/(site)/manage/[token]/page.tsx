@@ -4,7 +4,7 @@ import { ManageView } from "@/components/manage/ManageView";
 import { hasLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/server";
 import { TOKEN_RE } from "@/lib/ids";
-import { confirmCheckout, paymentMode } from "@/lib/server/billing";
+import { completeCheckout, paymentMode } from "@/lib/server/billing";
 import { getByToken, toView } from "@/lib/server/codes";
 import { currentOrigin, requestTime } from "@/lib/server/request";
 
@@ -26,14 +26,17 @@ export default async function ManagePage({ params, searchParams }: PageProps<"/[
   let row = await getByToken(token);
   if (!row) notFound();
 
-  // Visszatérés a Stripe-ról: a webhook megérkezése előtt is friss legyen az állapot.
-  if (sp.payment === "success" && typeof sp.session_id === "string") {
-    await confirmCheckout(sp.session_id, row);
+  // Back from a payment method that left the page (e.g. PayPal): the subscription is written onto the
+  // code before the page renders, so it is live even if the webhook has not arrived yet.
+  let flash: Flash = sp.new === "1" ? "new" : null;
+  if (typeof sp.checkout_session_id === "string") {
+    const paid = await completeCheckout(sp.checkout_session_id, row).catch((err) => {
+      console.error("[manage] checkout return", err);
+      return false;
+    });
+    flash = paid ? "paid" : "checkout-canceled";
     row = (await getByToken(token)) ?? row;
   }
-
-  const flash: Flash =
-    sp.new === "1" ? "new" : sp.payment === "success" ? "paid" : sp.payment === "canceled" ? "checkout-canceled" : null;
   const now = requestTime();
 
   return (
@@ -44,6 +47,7 @@ export default async function ManagePage({ params, searchParams }: PageProps<"/[
       origin={await currentOrigin()}
       mode={paymentMode()}
       flash={flash}
+      stripeKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ""}
     />
   );
 }

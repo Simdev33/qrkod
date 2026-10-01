@@ -1,9 +1,10 @@
-// Márka- és árazási alapadatok. A név és a domain egyelőre munkanév, itt egy helyen cserélhető.
+// Brand, domain and the plan – one place to change them.
 
 /**
- * A nyilvános cím, amit a QR-kódokba írunk. Nem kell beállítani: Vercelen a projekt éles domainje
- * (VERCEL_PROJECT_PRODUCTION_URL — saját domain esetén az, különben a *.vercel.app cím). A
- * NEXT_PUBLIC_SITE_URL csak opcionális felülírás. Üres szöveg = a kérés hosztja dönt (helyi futtatás).
+ * The public address written into the QR codes. Nothing to configure: on Vercel it is the project’s
+ * production domain (VERCEL_PROJECT_PRODUCTION_URL – the custom domain if there is one, otherwise the
+ * *.vercel.app address). NEXT_PUBLIC_SITE_URL is only an optional override. An empty string means the
+ * request’s host decides (local development).
  */
 export function configuredOrigin(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -13,19 +14,25 @@ export function configuredOrigin(): string {
 }
 
 export const brand = {
-  name: "Kockakód",
-  domain: "kockakod.hu",
+  name: "GenerateMyQRCodes",
+  domain: "generatemyqrcodes.com",
   url: configuredOrigin() || "http://localhost:3244",
-  email: "hello@kockakod.hu",
+  /** Contact address – not provided yet (the legal pages show “to be completed” while empty). */
+  email: "",
 };
 
-export const pricing = {
-  /** Az ingyenes időszak hossza napban. */
-  trialDays: 30,
-  /** Havidíj centben (USD). */
-  monthlyCents: 100,
-  currency: "usd" as const,
-  label: "1 $",
-};
+/**
+ * The only plan, per QR code: {introDays} days for {introCents}, then {monthlyCents} a month
+ * (a Stripe subscription with a trial and a one-off fee on its first invoice).
+ */
+export const PLAN = {
+  introDays: 7,
+  introCents: 100,
+  monthlyCents: 399,
+  currency: "EUR",
+} as const;
+
+/** Codes created before the paid plan had a free period; new codes get none. */
+export const FREE_DAYS = 0;
 
 export const DAY = 24 * 60 * 60 * 1000;

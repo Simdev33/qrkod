@@ -1,223 +1,249 @@
 import type { LegalTexts } from "./types";
 
-// Az irányadó (eredeti) változat. Tartalmi módosítás esetén a többi nyelvet is frissíteni kell.
+// Magyar fordítás. Az irányadó változat az angol eredeti (en.ts); annak módosításakor ezt is frissíteni kell.
 
 export const legalHu: LegalTexts = {
   ui: {
     effective: "Hatályos: {date}",
     toc: "Tartalom",
-    translationNote: "",
-    placeholderNote:
-      "A szögletes zárójelben álló szolgáltatói adatok még kitöltésre várnak. A dokumentum ezek nélkül nem teljes.",
+    translationNote: "Ez a dokumentum az angol nyelvű eredeti fordítása; bármilyen eltérés esetén az angol változat az irányadó.",
+    placeholderNote: "A szögletes zárójelben álló üzemeltetői adatok egy része még kitöltésre vár.",
   },
 
   terms: {
     title: "Általános Szerződési Feltételek",
-    lead: "Ez a dokumentum a(z) {brand} dinamikus QR-kód szolgáltatás ({siteUrl}) igénybevételének feltételeit tartalmazza. A szolgáltatás használatával – QR-kód létrehozásával vagy előfizetéssel – elfogadod ezeket a feltételeket.",
+    lead: "Ezek a feltételek a(z) {brand} webes szolgáltatás ({siteUrl}, a „Szolgáltatás”) használatára és az arra szóló előfizetésekre vonatkoznak. QR-kód létrehozásával vagy előfizetés megrendelésével elfogadod ezeket a feltételeket; ha nem értesz velük egyet, kérjük, ne használd a Szolgáltatást.",
     sections: [
       {
-        h: "A Szolgáltató adatai",
+        h: "Az Üzemeltető",
+        p: ["A Szolgáltatást a következő üzemeltető (az „Üzemeltető”) nyújtja:"],
         list: [
           "Név: {operatorName}",
           "Székhely: {operatorAddress}",
-          "Nyilvántartási szám: {operatorRegistry}",
+          "Nyilvántartás: {operatorRegistry}",
           "Adószám: {operatorTax}",
           "E-mail: {operatorEmail}",
           "Tárhelyszolgáltató: {hosting}",
         ],
       },
       {
-        h: "A szolgáltatás",
+        h: "A Szolgáltatás",
         p: [
-          "A(z) {brand} dinamikus QR-kódokat készít. A QR-kód egy, a Szolgáltató domainjén található rövid linket tartalmaz, amely a Felhasználó által megadott webcímre irányít tovább. A célcím a kód kezelőoldalán bármikor módosítható; a már kinyomtatott kód változatlanul használható marad.",
-          "A szolgáltatás része a kód megjelenésének testreszabása (színek, minta, logó, keret), a kód letöltése PNG és SVG formátumban, valamint a beolvasások napi számának megjelenítése.",
+          "A(z) {brand} dinamikus QR-kódokat készít. A QR-kód egy, az Üzemeltető domainjén található rövid linket tartalmaz, amely a látogatókat az általad megadott webcímre (a „célcímre”) irányítja tovább. A célcímet a kód kezelőoldalán bármikor módosíthatod; a már kinyomtatott kódok továbbra is működnek.",
+          "A Szolgáltatás része a kód megjelenésének testreszabása (színek, minta, logó, keret), a kód letöltése PNG és SVG formátumban, valamint a beolvasások napi számának megjelenítése.",
+          "A kód megtervezése és előnézete ingyenes. Ahhoz, hogy a kód továbbirányítsa a látogatókat és letölthető legyen, előfizetéssel aktiválni kell (lásd a 4. pontot).",
         ],
       },
       {
         h: "A szerződés létrejötte és a kezelőlink",
         p: [
-          "A szerződés a QR-kód létrehozásával, elektronikus úton jön létre. Nem minősül írásba foglalt szerződésnek, a Szolgáltató nem iktatja, és az ÁSZF-en kívül magatartási kódexre nem utal.",
-          "Regisztráció nincs. Minden kódhoz egy egyedi, titkos kezelőlink tartozik: aki ismeri, az kezelheti a kódot (módosíthatja, előfizethet rá, lemondhatja az előfizetést, törölheti). A kezelőlink megőrzése és titokban tartása a Felhasználó felelőssége. Elvesztése esetén a Szolgáltató csak akkor tud segíteni, ha a jogosultság más módon (például az előfizetéshez használt e-mail-címmel) hitelt érdemlően igazolható.",
-        ],
-      },
-      {
-        h: "Ingyenes időszak",
-        p: [
-          "Minden új kód a létrehozásától számított {trialDays} napig ingyenesen működik. Ehhez nem kell bankkártya, és az ingyenes időszak lejárta önmagában semmilyen fizetési kötelezettséget nem keletkeztet.",
+          "A szerződés elektronikus úton jön létre a QR-kód létrehozásával, a fizetős szolgáltatás esetében pedig az előfizetés megrendelésével. Az Üzemeltető a szerződést nem iktatja, és az magatartási kódexre nem utal.",
+          "Jelszavas regisztráció nincs. Minden kódhoz egy egyedi, titkos kezelőlink tartozik: aki ismeri, kezelheti a kódot (módosíthatja, előfizethet rá, lemondhatja az előfizetést, törölheti a kódot). A kezelőlink biztonságos megőrzése és titokban tartása a te felelősséged. Ha elveszíted, az Üzemeltető csak akkor tud segíteni, ha hitelt érdemlően igazolni tudod, hogy a kód a tiéd, például az előfizetéshez használt e-mail-címmel.",
         ],
       },
       {
         h: "Előfizetés és díjak",
         p: [
-          "Az ingyenes időszak után a kód előfizetéssel működik tovább. Az előfizetés díja kódonként havi {price}. {vatNote}",
-          "A fizetés bankkártyával, a Stripe biztonságos fizetési felületén történik; a kártyaadatok a Szolgáltatóhoz nem jutnak el. A díjat a Stripe havonta, előre terheli. A dollárban megadott díjat a kártyát kibocsátó bank a saját árfolyamán válthatja át.",
-          "Ha az ingyenes időszak alatt fizetsz elő, az első díjat az ingyenes időszak végén terheljük, feltéve, hogy abból legalább két nap még hátravan; ellenkező esetben az előfizetés és a terhelés azonnal indul. Az előfizetés ezután havonta automatikusan megújul, amíg le nem mondod.",
-          "A kifizetésekről elektronikus bizonylatot küldünk az előfizetéskor megadott e-mail-címre.",
-          "A Szolgáltató a díjat a jövőre nézve módosíthatja. A változásról legalább 30 nappal korábban, az előfizetéskor megadott e-mail-címen tájékoztat; a módosítás a következő számlázási időszaktól lép hatályba. Ha nem fogadod el, az előfizetést addig lemondhatod.",
+          "Minden QR-kódhoz saját előfizetés tartozik. Az előfizetés egy {days} napos bevezető időszakkal indul, amelynek díja {intro}. Ez alatt az időszak alatt a kód teljes körűen működik.",
+          "Ha a bevezető időszak végéig nem mondod le az előfizetést, a {next}. naptól automatikusan kódonként havi {monthly} díjjal folytatódik, és havonta megújul, amíg le nem mondod. A havi díjat minden időszak elején terheljük a megrendeléskor megadott fizetési módra.",
+          "Ha olyan kódot aktiválsz újra, amelynek előfizetése megszűnt, az előfizetés bevezető időszak nélkül, havi {monthly} díjjal indul újra, azonnali terheléssel.",
+          "A fizetendő teljes összeg a megrendelés leadása előtt egyértelműen megjelenik a fizetési oldalon. A megrendelés a fizetési kötelezettséget jelző gomb (vagy a választott fizetési mód gombja) megnyomásával jön létre.",
+          "A díjak változásáról az előfizetőket legalább 30 nappal a változás hatálybalépése előtt e-mailben értesítjük; ha nem fogadod el, addig lemondhatod az előfizetésedet.",
+        ],
+      },
+      {
+        h: "Fizetés",
+        p: [
+          "A fizetéseket a következő szolgáltató dolgozza fel: {payments}. Az elérhető fizetési módok az eszközödtől, a böngésződtől és az országodtól függenek, és lehetnek köztük betéti és hitelkártyák, az Apple Pay, a Google Pay, a PayPal és a Link. Az Üzemeltető nem látja és nem tárolja a kártyaadataidat.",
+          "Minden sikeres fizetésről a Stripe e-mailben nyugtát küld. A jogszabály által előírt számlát az Üzemeltető állítja ki.",
+          "Ha egy havi terhelés sikertelen, a Stripe néhány napon belül újra megpróbálja; ha ez sem sikerül, az előfizetés megszűnik, és a kód szünetel.",
         ],
       },
       {
         h: "Lemondás",
         p: [
-          "Az előfizetés a kód kezelőoldalán bármikor, egy kattintással lemondható. A lemondás a már kifizetett időszak végén lép hatályba, addig a kód működik, és a lemondás addig vissza is vonható. Hűségidő nincs.",
-          "A megkezdett számlázási időszak díját nem térítjük vissza, kivéve, ha jogszabály – különösen az elállási jog – másként rendelkezik.",
+          "Egy kód előfizetését bármikor, indokolás nélkül, egy kattintással lemondhatod a kód kezelőoldalán.",
+          "A lemondás az aktuális időszak végén lép hatályba: addig a kód tovább működik, további terhelés pedig nem történik. Addig a lemondást vissza is vonhatod. Ha a bevezető időszak alatt mondasz le, a {next}. naptól havi díjat nem terhelünk.",
+          "A már megkezdett időszak díját nem térítjük vissza, kivéve, ha az elállási jogodat gyakorlod, illetve más, jogszabályban előírt esetekben.",
         ],
       },
       {
-        h: "A kód szünetelése és törlése",
+        h: "Szünetelő és törölt kódok",
         p: [
-          "Ha a kódnak nincs érvényes ingyenes időszaka vagy kifizetett előfizetése, a kód szünetel: a beolvasók egy tájékoztató oldalt látnak, a továbbítás nem működik. Előfizetéssel a kód bármikor újraéleszthető, ugyanazzal a rövid linkkel.",
-          "A szünetelő kódot és beállításait a szünetelés kezdetétől számított {retentionMonths} hónapig megőrizzük, utána véglegesen töröljük. A kódot a kezelőoldalon bármikor azonnal törölheted; törléskor az esetleges előfizetés is azonnal megszűnik.",
+          "Ha egy kódnak nincs aktív előfizetése, a kód szünetel: aki beolvassa, egy tájékoztató oldalt lát, és nem irányítjuk tovább. A szünetelő kódot bármikor újra aktiválhatod; a rövid linkje ugyanaz marad.",
+          "A soha nem aktivált kódokat {pendingDays} napig, a szünetelő kódokat a szünetelés kezdetétől számított {retentionMonths} hónapig őrizzük meg; ezt követően véglegesen töröljük őket. A kódot a kezelőoldalán bármikor magad is törölheted; a törléssel az előfizetése is azonnal megszűnik.",
         ],
       },
       {
         h: "Elállási jog",
         p: [
-          "Ha fogyasztó vagy, a fogyasztó és a vállalkozás közötti szerződések részletes szabályairól szóló 45/2014. (II. 26.) Korm. rendelet alapján az előfizetés megkötésétől számított 14 napon belül indokolás nélkül elállhatsz a szerződéstől. Az elállási nyilatkozatot a {operatorEmail} címre küldheted; ehhez használhatod az alábbi mintát, de nem kötelező.",
-          "Előfizetéskor kifejezetten kérheted, hogy a Szolgáltató a fizetős szolgáltatás nyújtását az elállási határidő lejárta előtt megkezdje. Ebben az esetben, ha a határidőn belül mégis elállsz, a már teljesített szolgáltatás arányos díját kell megfizetned; ha pedig a szolgáltatást a határidőn belül teljes egészében teljesítettük, az elállási jogodat elveszíted.",
-          "Elállás esetén a kifizetett összeget – az esetleges arányos díj levonásával – legkésőbb az elállási nyilatkozat kézhezvételétől számított 14 napon belül, az eredeti fizetési móddal térítjük vissza.",
+          "Ha fogyasztóként rendelsz előfizetést, a megrendeléstől számított 14 napon belül indokolás nélkül elállhatsz a szerződéstől. Elállási döntésedről egyértelmű nyilatkozattal tájékoztathatod az Üzemeltetőt, például a {operatorEmail} címre küldött e-mailben; ehhez használhatod a 2011/83/EU irányelv I. melléklet B. részében található minta-elállási nyilatkozatot, de ez nem kötelező.",
+          "Mivel a megrendeléskor kifejezetten kéred a Szolgáltatás azonnali megkezdését, elállás esetén az elállásig igénybe vett időszakra arányos díjat kell fizetned. A fennmaradó összeget az elállásod közlésétől számított 14 napon belül visszatérítjük a fizetéshez használt fizetési módra.",
+          "Az elállási jog nem érinti azt a lehetőségedet, hogy az előfizetést bármikor lemondd (lásd a 6. pontot).",
         ],
+      },
+      {
+        h: "Felhasználási feltételek",
+        p: ["A Szolgáltatást csak jogszerű célokra és e feltételeknek megfelelően használhatod. Egy kód célcíme különösen nem vezethet olyan tartalomra, amely:"],
         list: [
-          "Minta-elállási nyilatkozat – Címzett: {operatorName}, {operatorEmail}",
-          "Alulírott kijelentem, hogy gyakorlom elállási jogomat a következő szolgáltatás nyújtására irányuló szerződés tekintetében: {brand} előfizetés, a QR-kód rövid linkje: …",
-          "A szerződéskötés időpontja: … · A fogyasztó neve és címe: … · Kelt: …",
+          "jogellenes, vagy mások jogait (például szerzői vagy személyiségi jogait) sérti;",
+          "megtévesztő vagy csalárd, különösen adathalász oldal;",
+          "kártékony szoftvert terjeszt, vagy más módon kárt okoz a látogató eszközében;",
+          "gyűlöletre vagy erőszakra uszít.",
         ],
-      },
-      {
-        h: "A Felhasználó kötelezettségei, tiltott felhasználás",
-        p: [
-          "A megadott célcím tartalmáért a Felhasználó felel. Tilos a kódot jogsértő, megtévesztő (különösen adathalász), kártékony szoftvert terjesztő, gyűlöletkeltő vagy harmadik személy jogait sértő tartalomra irányítani, illetve a szolgáltatást kéretlen üzenetek terjesztésére használni.",
-          "A Szolgáltató jogosult az ilyen kódot értesítés nélkül felfüggeszteni vagy törölni, és az illetékes hatóságokkal együttműködni. Jogellenes tartalmat a {operatorEmail} címen jelenthetsz be.",
-          "A szolgáltatás tömeges, automatizált igénybevétele korlátozható; jelenleg egy címről óránként legfeljebb {hourlyLimit} új kód hozható létre.",
-        ],
-      },
-      {
-        h: "Rendelkezésre állás és felelősség",
-        p: [
-          "A Szolgáltató a folyamatos működésre törekszik, de nem garantálja a megszakítás- és hibamentes rendelkezésre állást. Karbantartás, hiba vagy külső szolgáltató (tárhely, adatbázis, fizetés) kiesése miatt a szolgáltatás átmenetileg elérhetetlen lehet.",
-          "A Szolgáltató nem felel a célcím tartalmáért és elérhetőségéért, valamint azért, ha a kinyomtatott kód a nem megfelelő méret, szín vagy nyomtatási minőség miatt nem olvasható be. Nyomtatás előtt mindig próbáld ki a kódot.",
-          "A Szolgáltató felelőssége a jogszabályok által megengedett mértékben az adott kódért a kár bekövetkezését megelőző 12 hónapban megfizetett díj összegére korlátozódik. Ez a korlátozás nem vonatkozik a szándékosan vagy súlyos gondatlansággal okozott, illetve az életet, testi épséget vagy egészséget megsértő károkra, és nem érinti a fogyasztók jogszabályban biztosított jogait.",
+        after: [
+          "A Szolgáltatás nem használható kéretlen üzenetek (spam) küldésére, és nem kísérelheted meg biztonsági vagy fizetési intézkedéseinek megkerülését, illetve működésének akadályozását. A visszaélések megelőzése érdekében egy címről óránként legfeljebb {hourlyLimit} új kód hozható létre.",
+          "Az Üzemeltető az ilyen kódokat értesítés nélkül felfüggesztheti vagy törölheti, és együttműködhet az illetékes hatóságokkal; e feltételek súlyos megsértése esetén az előfizetés azonnali hatállyal megszüntethető. Jogellenes tartalmat a {operatorEmail} címen jelenthetsz be.",
         ],
       },
       {
         h: "Szellemi tulajdon",
         p: [
-          "A weboldal, a szoftver és a(z) {brand} arculata a Szolgáltató szellemi tulajdona. Az általad létrehozott QR-kód képét korlátozás nélkül, díjmentesen felhasználhatod. A feltöltött logóért és annak felhasználási jogáért te felelsz.",
+          "A Szolgáltatás szoftvere, dizájnja, logója és szövegei az Üzemeltető szellemi tulajdonát képezik; nem másolhatók, nem értékesíthetők tovább, és nem kínálhatók saját szolgáltatásként.",
+          "Az általad létrehozott QR-kódok képeit szabadon, forrásmegjelölés nélkül felhasználhatod. Az általad feltöltött logóért és annak felhasználási jogáért te felelsz.",
           "A „QR Code” a DENSO WAVE INCORPORATED bejegyzett védjegye.",
         ],
       },
       {
-        h: "Panaszkezelés és jogorvoslat",
+        h: "Felelősség",
         p: [
-          "Panaszodat a {operatorEmail} címre küldheted; legkésőbb 30 napon belül érdemben válaszolunk.",
-          "Ha a panasz rendezése nem sikerül, fogyasztóként a lakóhelyed vagy tartózkodási helyed szerint illetékes békéltető testülethez vagy a fogyasztóvédelmi hatósághoz fordulhatsz, illetve bírósághoz fordulhatsz. Más uniós tagállamban élő fogyasztóként az Európai Fogyasztói Központok Hálózatától (ECC-Net) is kérhetsz segítséget.",
+          "Az Üzemeltető mindent megtesz a Szolgáltatás folyamatos és hibátlan működéséért, de nem garantálja, hogy az megszakítás és hibák nélkül elérhető lesz. Karbantartás, hiba vagy egy külső szolgáltató (tárhely, adatbázis, fizetés) kiesése miatt a Szolgáltatás átmenetileg elérhetetlen lehet.",
+          "Az Üzemeltető nem felel a célcím tartalmáért és elérhetőségéért, sem azért, ha egy kinyomtatott kód a mérete, a színei vagy a nyomtatás minősége miatt nem olvasható be. Nyomtatás előtt mindig próbáld ki a kódot egy telefonnal.",
+          "A jogszabályok által megengedett legteljesebb mértékben az Üzemeltető nem felel a Szolgáltatás használatából vagy használhatatlanságából eredő közvetett károkért vagy elmaradt haszonért. Ez a korlátozás nem vonatkozik a szándékosan vagy súlyos gondatlansággal okozott, illetve az életet, testi épséget vagy egészséget megsértő károkért való felelősségre, és nem érinti a fogyasztókat jogszabály alapján megillető jogokat.",
         ],
       },
       {
-        h: "Az ÁSZF módosítása, nyelv és irányadó jog",
+        h: "Elérhetőség és változások",
         p: [
-          "A Szolgáltató az ÁSZF-et módosíthatja. A módosítást hatálybalépése előtt legalább 15 nappal közzéteszi ezen az oldalon, az előfizetőket e-mailben is értesíti. A módosítás a már kifizetett időszakot nem érinti.",
-          "Az ÁSZF-re a magyar jog irányadó. Fogyasztó esetén ez nem fosztja meg a fogyasztót a szokásos tartózkodási helye szerinti állam kötelező fogyasztóvédelmi szabályainak védelmétől.",
-          "Az ÁSZF magyar nyelven készült, a más nyelvű változatok fordítások. Eltérés esetén a magyar változat az irányadó.",
+          "Az Üzemeltető jogosult a Szolgáltatást fejleszteni és módosítani. Ha a Szolgáltatás véglegesen megszűnik, az előfizetéseket megszüntetjük, és a fel nem használt időszak díját időarányosan visszatérítjük.",
         ],
+      },
+      {
+        h: "Adatvédelem",
+        p: ["A személyes adatok kezelésének részleteit az Adatkezelési tájékoztató tartalmazza."],
+      },
+      {
+        h: "A feltételek módosítása",
+        p: [
+          "Az Üzemeltető jogosult e feltételeket módosítani. A módosítások az ezen az oldalon történő közzététellel, a dokumentum tetején feltüntetett hatálybalépési napon lépnek hatályba. Az előfizetőket a számukra hátrányos lényeges változásokról legalább 30 nappal előre e-mailben értesítjük; ha nem fogadják el a változásokat, a hatálybalépés előtt lemondhatják az előfizetésüket.",
+        ],
+      },
+      {
+        h: "Irányadó jog és jogviták",
+        p: [
+          "E feltételekre a szlovák jog irányadó. Ha fogyasztóként használod a Szolgáltatást, ez a jogválasztás nem foszt meg attól a védelemtől, amelyet a lakóhelyed szerinti ország kötelező fogyasztóvédelmi szabályai biztosítanak számodra.",
+          "A jogvitákat igyekszünk békés úton rendezni: panaszodat a {operatorEmail} címre küldheted, és 30 napon belül válaszolunk. Ha a panaszodat elutasítjuk, vagy 30 napon belül nem válaszolunk, fogyasztóként alternatív vitarendezési eljárást kezdeményezhetsz a következő szervnél: {adr}, vagy a szlovák Gazdasági Minisztérium listáján szereplő más vitarendezési testületnél. A lakóhelyed szerinti fogyasztóvédelmi hatósághoz és bírósághoz is fordulhatsz.",
+          "E feltételek több nyelven is elérhetők; bármilyen eltérés esetén az angol változat az irányadó.",
+        ],
+      },
+      {
+        h: "Kapcsolat",
+        p: ["Kérdéseiddel, észrevételeiddel vagy panaszaiddal a következő e-mail-címen fordulhatsz az Üzemeltetőhöz: {operatorEmail}."],
       },
     ],
   },
 
   privacy: {
     title: "Adatkezelési tájékoztató",
-    lead: "Ebben a tájékoztatóban leírjuk, milyen személyes adatokat kezelünk a(z) {brand} ({siteUrl}) használata során, milyen célból és meddig, valamint hogy milyen jogaid vannak. Az adatkezelés az Európai Unió általános adatvédelmi rendelete (GDPR) és az információs önrendelkezési jogról szóló 2011. évi CXII. törvény szerint történik.",
+    lead: "Az (EU) 2016/679 rendelet (általános adatvédelmi rendelet, GDPR) alapján ez a tájékoztató bemutatja, milyen személyes adatokat kezelünk a(z) {brand} ({siteUrl}) használata során, milyen célból, milyen jogalapon és meddig, valamint hogy milyen jogaid vannak.",
     sections: [
       {
         h: "Az adatkezelő",
-        list: ["Név: {operatorName}", "Székhely: {operatorAddress}", "E-mail: {operatorEmail}"],
-        after: ["Adatvédelmi tisztviselő kijelölésére nem vagyunk kötelesek."],
+        list: [
+          "Név: {operatorName}",
+          "Székhely: {operatorAddress}",
+          "Nyilvántartás: {operatorRegistry}",
+          "E-mail: {operatorEmail}",
+        ],
+        after: ["Adatvédelmi ügyekben a {operatorEmail} címen érsz el minket."],
       },
       {
         h: "Röviden",
         list: [
-          "Nincs regisztráció és jelszó, és nem használunk hirdetési, analitikai vagy követő sütiket.",
-          "A QR-kódok beolvasóiról nem tárolunk személyes adatot, csak a beolvasások napi darabszámát.",
-          "A bankkártyaadataid a Stripe-nál maradnak, azokhoz nem férünk hozzá.",
+          "Nincs regisztráció és jelszó; minden kódot a saját titkos kezelőlinkjével kezelhetsz.",
+          "A kódjaidat beolvasó személyekről nem tárolunk személyes adatot – csak a beolvasások napi számát.",
+          "A fizetéseket a Stripe dolgozza fel; a kártyaadataidat nem látjuk és nem tároljuk.",
+          "Nem használunk analitikai, hirdetési vagy követő sütiket.",
         ],
       },
       {
         h: "QR-kód létrehozása és működtetése",
         p: [
-          "<b>Kezelt adatok:</b> a megadott célcím (URL), a kód megnevezése, a megjelenési beállítások (színek, minta, felirat, feltöltött logó), a kód rövid azonosítója és titkos kezelő-tokenje, a létrehozás és a lejárat időpontja, valamint a beolvasások napi száma. A célcím és a megnevezés akkor tartalmaz személyes adatot, ha te ilyet adsz meg (például egy személyes profil linkjét).",
-          "<b>Cél:</b> a szolgáltatás nyújtása – a továbbítás, a kezelőoldal és a statisztika működtetése. <b>Jogalap:</b> szerződés teljesítése (GDPR 6. cikk (1) b) pont).",
-          "<b>Megőrzés:</b> amíg a kódot nem törlöd; szünetelő kód esetén legfeljebb a szünetelés kezdetétől számított {retentionMonths} hónapig.",
+          "<b>Kezelt adatok:</b> a megadott célcím (URL), a kód neve, a megjelenési beállításai (színek, minta, felirat, feltöltött logó), a kód rövid azonosítója és titkos kezelő-tokenje, a létrehozás időpontja és az aktív időszak vége, valamint a beolvasások napi száma. A célcím és a név csak akkor tartalmaz személyes adatot, ha te ilyet adsz meg (például egy személyes profil linkjét).",
+          "<b>Cél:</b> a Szolgáltatás nyújtása – a látogatók továbbirányítása, a kezelőoldal és a statisztika. <b>Jogalap:</b> szerződés teljesítése (GDPR 6. cikk (1) bekezdés b) pont).",
+          "<b>Megőrzés:</b> amíg a kódot nem törlöd; a soha nem aktivált kódok esetén {pendingDays} napig; a szünetelő kódok esetén a szünetelés kezdetétől számított {retentionMonths} hónapig.",
         ],
       },
       {
         h: "Visszaélések megelőzése",
         p: [
-          "<b>Kezelt adatok:</b> a kódot létrehozó eszköz IP-címe, kizárólag sózott, visszafejthetetlen hash-lenyomat formájában, a létrehozás időpontjával.",
-          "<b>Cél:</b> a tömeges, automatizált kódgyártás korlátozása (legfeljebb {hourlyLimit} kód óránként). <b>Jogalap:</b> jogos érdekünk a szolgáltatás biztonságos és stabil működésében (GDPR 6. cikk (1) f) pont). <b>Megőrzés:</b> a kóddal együtt.",
+          "<b>Kezelt adatok:</b> a kódot létrehozó eszköz IP-címe, kizárólag sózott, visszafejthetetlen hash-lenyomatként tárolva, a létrehozás időpontjával együtt.",
+          "<b>Cél:</b> a kódok tömeges, automatizált létrehozásának korlátozása (óránként legfeljebb {hourlyLimit}). <b>Jogalap:</b> a Szolgáltatás biztonságos és stabil működéséhez fűződő jogos érdekünk (GDPR 6. cikk (1) bekezdés f) pont). <b>Megőrzés:</b> a kóddal együtt.",
         ],
       },
       {
         h: "Előfizetés és fizetés",
         p: [
-          "Előfizetéskor a fizetési adatokat (név, e-mail-cím, bankkártyaadatok, számlázási ország) a Stripe gyűjti és kezeli, a fizetés lebonyolítása és a csalások megelőzése tekintetében önálló adatkezelőként, a saját adatvédelmi tájékoztatója szerint.",
-          "<b>Hozzánk kerülő adatok:</b> a Stripe-ügyfél és -előfizetés azonosítója, az előfizetés állapota és időszakai; a Stripe felületén hozzáférünk az ügyfél nevéhez, e-mail-címéhez, számlázási országához és a kifizetésekhez. Bankkártyaszámot nem látunk.",
-          "<b>Cél:</b> az előfizetés kezelése és a díj beszedése, az előfizetéssel kapcsolatos értesítések. <b>Jogalap:</b> szerződés teljesítése (GDPR 6. cikk (1) b) pont); a számviteli bizonylatok megőrzése jogi kötelezettség (GDPR 6. cikk (1) c) pont, a számvitelről szóló 2000. évi C. törvény 169. §).",
-          "<b>Megőrzés:</b> az előfizetés megszűnéséig; a számviteli bizonylatokat 8 évig.",
+          "Ha előfizetsz, a fizetési űrlapon megadott adatokat a Stripe kezeli; hozzánk az előfizetéseid nyilvántartásához szükséges adatok kerülnek.",
+        ],
+        list: [
+          "Kezelt adatok: e-mail-cím, a Stripe által kiosztott ügyfél- és előfizetés-azonosítók, az egyes előfizetések állapota és időszakai, valamint az a kód, amelyhez tartoznak, a kifizetések összege és dátuma, a fizetési mód típusa (például kártya és annak utolsó 4 számjegye), továbbá – ha a fizetési űrlap bekéri – a számlázási ország és az irányítószám.",
+          "Cél: az előfizetések létrehozása és teljesítése, a díjak beszedése, a számlázás és az ügyfélszolgálat.",
+          "Jogalap: szerződés teljesítése (GDPR 6. cikk (1) bekezdés b) pont); a számviteli nyilvántartások vezetése esetén jogi kötelezettség teljesítése (GDPR 6. cikk (1) bekezdés c) pont).",
+          "Megőrzés: amíg az előfizetés fennáll; megszűnése után a számviteli nyilvántartásokat a szlovák számviteli törvény (431/2002 Tt.) 35. §-a alapján 10 évig őrizzük. A többi adatot az előfizetés megszűnése után kérésedre töröljük.",
+        ],
+        after: [
+          "A fizetéseket a következő szolgáltató dolgozza fel: {payments}; ez a fizetési adatok és a csalásmegelőzés tekintetében önálló adatkezelő. Adatkezeléséről itt tájékozódhatsz: {paymentsPrivacy}.",
         ],
       },
       {
-        h: "Kapcsolattartás",
+        h: "Kapcsolatfelvétel",
         p: [
-          "Ha e-mailt írsz nekünk, a nevedet, e-mail-címedet és az üzenet tartalmát a megkeresés megválaszolására használjuk. <b>Jogalap:</b> jogos érdekünk a megkeresések kezelésében (GDPR 6. cikk (1) f) pont). <b>Megőrzés:</b> az ügy lezárását követő 1 évig.",
+          "Ha írsz nekünk, a nevedet, az e-mail-címedet és az üzeneted tartalmát a válaszadáshoz használjuk. <b>Jogalap:</b> a megkeresések kezeléséhez fűződő jogos érdekünk (GDPR 6. cikk (1) bekezdés f) pont). <b>Megőrzés:</b> az ügy lezárását követő 1 évig.",
         ],
       },
       {
         h: "Technikai naplók",
         p: [
-          "A tárhelyszolgáltató a weboldal működtetése és biztonsága érdekében automatikusan naplózza a kéréseket (IP-cím, időpont, lekért cím, böngésző típusa) – ez a QR-kódok beolvasásakor is így van. A naplókat a tárhelyszolgáltató rövid ideig, a saját szabályai szerint őrzi, és mi csak hibakereséshez használjuk. <b>Jogalap:</b> jogos érdekünk a biztonságos működésben (GDPR 6. cikk (1) f) pont).",
+          "Az oldal kiszolgálásakor – mint bármely weboldal esetében – a tárhelyszolgáltató szerverei technikai adatokat rögzítenek: IP-cím, a kérés időpontja, a lekért cím és a böngésző típusa. Ez egy QR-kód beolvasásakor is így történik. <b>Cél:</b> a Szolgáltatás biztonságos és zavartalan működése, valamint a hibák és visszaélések felderítése. <b>Jogalap:</b> jogos érdekünk (GDPR 6. cikk (1) bekezdés f) pont). <b>Megőrzés:</b> rövid ideig, a tárhelyszolgáltató adatmegőrzési szabályai szerint.",
         ],
       },
       {
         h: "Sütik és helyi tárolás",
         list: [
-          "NEXT_LOCALE süti: a választott nyelvet jegyzi meg, 1 évig.",
-          "Böngészőtár (localStorage): az ezen az eszközön készített vagy megnyitott kódok kezelőlinkjei, hogy a „Kódjaim” oldalon megtaláld őket. A Kódjaim oldal ezekkel kérdezi le a kódok állapotát; egyébként a böngésződben maradnak, és bármikor törölheted őket a böngésző beállításaiban.",
-          "A Stripe fizetőoldala a saját sütijeit használja, a Stripe szabályai szerint.",
+          "NEXT_LOCALE süti: megjegyzi a nyelvválasztóban kiválasztott nyelvet (1 évig).",
+          "Helyi tárolás (localStorage): az ezen az eszközön létrehozott vagy megnyitott kódok kezelőlinkjei, hogy megtaláld őket a „Kódjaim” oldalon. A „Kódjaim” oldal ezekkel kérdezi le a kódjaid állapotát; egyébként a böngésződben maradnak, és a böngésző beállításaiban bármikor törölheted őket.",
+          "A fizetési űrlapot a Stripe biztosítja, amely saját sütiket használ a fizetés biztonságos lebonyolításához és a csalások megelőzéséhez.",
         ],
-        after: ["Ezek a szolgáltatás működéséhez szükségesek, ezért nem kérünk hozzájuk külön hozzájárulást."],
+        after: ["Ezek a Szolgáltatás működéséhez szükségesek, ezért nem igényelnek hozzájárulást. Analitikai vagy hirdetési sütiket nem használunk."],
       },
       {
-        h: "Adatfeldolgozók és címzettek",
+        h: "Adatfeldolgozók és adattovábbítás",
         list: [
-          "Tárhely és szerverfunkciók: {hosting}",
-          "Adatbázis: {database} – a kódok adatait az Európai Unióban (Írország) lévő szerveren tárolja.",
+          "Tárhely és alkalmazásszerver: {hosting}",
+          "Adatbázis: {database} – a kódok adatait az Európai Unióban (Írországban) lévő szerveren tárolja.",
           "Fizetés: {payments} – önálló adatkezelőként.",
         ],
         after: [
-          "Adataidat nem adjuk el, és marketingcélra nem adjuk át senkinek. Hatóság részére csak jogszabályban előírt esetben továbbítunk adatot.",
-        ],
-      },
-      {
-        h: "Adattovábbítás az Európai Unión kívülre",
-        p: [
-          "Egyes adatfeldolgozóink az Egyesült Államokban székelnek. Ha az adatkezelés során adat kerül az EU-n kívülre, az az EU–USA adatvédelmi keretrendszer (Data Privacy Framework) vagy az Európai Bizottság által elfogadott általános szerződési feltételek (SCC) alapján történik.",
+          "E szolgáltatók némelyikének székhelye az Amerikai Egyesült Államokban van, így adatok az Európai Gazdasági Térségen kívülre is kerülhetnek. Az ilyen adattovábbítás megfelelő garanciák mellett történik (az EU–USA adatvédelmi keretrendszer és/vagy az Európai Bizottság által elfogadott általános szerződési feltételek alapján).",
+          "Adataidat más harmadik féllel nem osztjuk meg, nem adjuk el, és nem használjuk marketingre, profilalkotásra vagy automatizált döntéshozatalra. Hatóságoknak csak akkor adunk ki adatot, ha azt jogszabály előírja.",
         ],
       },
       {
         h: "Adatbiztonság",
         p: [
-          "A kapcsolat titkosított (HTTPS). A kezelő-token 192 bites véletlen érték, az IP-címeket csak sózott hash-ként tároljuk, az adatbázishoz csak a Szolgáltató fér hozzá.",
+          "Minden kapcsolat titkosított (HTTPS). A kezelő-token 192 bites véletlen érték, az IP-címeket csak sózott hash-ként tároljuk, és az adatbázishoz csak az Üzemeltető fér hozzá.",
         ],
       },
       {
         h: "Jogaid",
         list: [
-          "Hozzáférés: tájékoztatást kérhetsz a rólad kezelt adatokról (GDPR 15. cikk).",
-          "Helyesbítés: kérheted a pontatlan adatok javítását (16. cikk).",
-          "Törlés: kérheted az adataid törlését (17. cikk); a kódot a kezelőoldalon magad is azonnal törölheted.",
-          "Korlátozás: kérheted az adatkezelés korlátozását (18. cikk).",
-          "Adathordozhatóság: kérheted az általad megadott adatok géppel olvasható kiadását (20. cikk).",
-          "Tiltakozás: tiltakozhatsz a jogos érdeken alapuló adatkezelés ellen (21. cikk).",
+          "tájékoztatáshoz és hozzáféréshez való jog (GDPR 15. cikk);",
+          "helyesbítéshez való jog (16. cikk);",
+          "törléshez való jog (17. cikk) – a kódot a kezelőoldalán bármikor magad is törölheted;",
+          "az adatkezelés korlátozásához való jog (18. cikk);",
+          "adathordozhatósághoz való jog (20. cikk);",
+          "a jogos érdeken alapuló adatkezelés elleni tiltakozás joga (21. cikk).",
         ],
         after: [
           "Kérelmedet a {operatorEmail} címre küldheted. A kód azonosításához add meg a rövid linkjét. Legkésőbb egy hónapon belül válaszolunk.",
@@ -226,18 +252,17 @@ export const legalHu: LegalTexts = {
       {
         h: "Jogorvoslat",
         p: [
-          "Ha úgy érzed, hogy megsértettük az adatvédelmi jogaidat, kérjük, először írj nekünk. Panaszt tehetsz a Nemzeti Adatvédelmi és Információszabadság Hatóságnál (NAIH; 1055 Budapest, Falk Miksa utca 9–11.; postacím: 1363 Budapest, Pf. 9.; www.naih.hu), a lakóhelyed szerinti adatvédelmi felügyeleti hatóságnál, vagy bírósághoz is fordulhatsz.",
+          "Ha úgy érzed, hogy személyes adataid kezelése jogszabályt sért, panaszt tehetsz az adatkezelő székhelye szerinti felügyeleti hatóságnál, a Szlovák Köztársaság Személyesadat-védelmi Hivatalánál ({authority}), vagy a lakóhelyed, illetve munkavégzési helyed szerinti adatvédelmi hatóságnál – Magyarországon például a Nemzeti Adatvédelmi és Információszabadság Hatóságnál (NAIH; 1055 Budapest, Falk Miksa utca 9–11.; https://naih.hu).",
+          "Jogaid megsértése esetén bírósághoz is fordulhatsz; a pert a lakóhelyed szerinti tagállam bírósága előtt is megindíthatod.",
         ],
       },
       {
-        h: "Kiskorúak",
-        p: [
-          "16 éven aluliak a szolgáltatást csak szülői hozzájárulással vehetik igénybe. Előfizetni csak nagykorú személy vagy a kiskorú törvényes képviselője tud.",
-        ],
+        h: "Gyermekek",
+        p: ["A Szolgáltatás nem 16 éven aluli gyermekeknek szól, és tudatosan nem kezeljük az adataikat. Előfizetést csak nagykorú személy rendelhet."],
       },
       {
         h: "A tájékoztató módosítása",
-        p: ["A tájékoztatót frissíthetjük. A mindenkor hatályos változat ezen az oldalon érhető el, a hatálybalépés dátumával."],
+        p: ["Ezt a tájékoztatót a Szolgáltatás minden változásakor frissítjük; a hatálybalépés dátuma a dokumentum tetején látható."],
       },
     ],
   },

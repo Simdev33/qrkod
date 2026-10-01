@@ -29,12 +29,14 @@ export function ManageView({
   origin,
   mode,
   flash,
+  stripeKey,
 }: {
   initial: CodeView;
   serverNow: number;
   origin: string;
   mode: PaymentMode;
   flash: Flash;
+  stripeKey: string;
 }) {
   const router = useRouter();
   const { t, l, error: errorText } = useI18n();
@@ -46,8 +48,7 @@ export function ManageView({
   const [banner, setBanner] = useState<Flash>(flash);
 
   const shortUrl = `${origin}/q/${code.id}`;
-  // Nyelv nélküli kezelőlink: megnyitáskor a látogató saját nyelvén jelenik meg.
-  const manageUrl = `${origin}/manage/${code.token}`;
+  const manageUrl = `${origin}${l(`/manage/${code.token}`)}`;
   const status = lifeStatus(code, now);
   const design = draft ?? code.design;
 
@@ -63,7 +64,7 @@ export function ManageView({
     return () => clearInterval(timer);
   }, []);
 
-  // A ?new=1 / ?payment=… paramétert eltüntetjük, hogy frissítéskor ne jöjjön újra az üzenet.
+  // The ?new=1 / ?checkout_session_id=… parameter is removed, so a reload doesn’t show the message again.
   useEffect(() => {
     if (flash) router.replace(l(`/manage/${code.token}`), { scroll: false });
   }, [flash, code.token, router, l]);
@@ -78,6 +79,19 @@ export function ManageView({
     setCode(next);
     setNow(Date.now());
   }, []);
+
+  // A code that was ever paid for (or had a free period) can be downloaded; a never-activated one can’t.
+  const canDownload = status.alive || status.phase !== "pending";
+
+  const activated = useCallback(
+    (next: CodeView) => {
+      update(next);
+      setBanner("paid");
+      notify(M.paywall.success);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [update, notify, M.paywall.success],
+  );
 
   async function saveDesign() {
     if (!draft) return;
@@ -149,29 +163,31 @@ export function ManageView({
               </div>
               {!status.alive && (
                 <motion.span
+                  key={status.phase}
                   initial={{ scale: 0.6, opacity: 0, rotate: -14 }}
                   animate={{ scale: 1, opacity: 1, rotate: -8 }}
                   transition={{ type: "spring", stiffness: 300, damping: 14, delay: 0.5 }}
                   className="display absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-[1.5px] border-ink bg-coral px-5 py-2.5 text-xl text-white shadow-[4px_4px_0_var(--color-ink)]"
                 >
-                  {M.pausedStamp}
+                  {status.phase === "pending" ? M.pendingStamp : M.pausedStamp}
                 </motion.span>
               )}
             </div>
 
+            {/* Downloading needs an activated code – like the PDF download on GetProCV. */}
             <div className="mt-5 grid grid-cols-3 gap-2">
-              <button type="button" className="btn btn-ink px-3 text-sm" onClick={() => download("png", 1200)}>
+              <button type="button" className="btn btn-ink px-3 text-sm" disabled={!canDownload} onClick={() => download("png", 1200)}>
                 <IconDownload className="size-4" /> {M.png}
               </button>
-              <button type="button" className="btn btn-ghost px-3 text-sm" onClick={() => download("png", 2400)}>
+              <button type="button" className="btn btn-ghost px-3 text-sm" disabled={!canDownload} onClick={() => download("png", 2400)}>
                 {M.pngLarge}
               </button>
-              <button type="button" className="btn btn-ghost px-3 text-sm" onClick={() => download("svg")}>
+              <button type="button" className="btn btn-ghost px-3 text-sm" disabled={!canDownload} onClick={() => download("svg")}>
                 {M.svg}
               </button>
             </div>
             <p className="mt-3 text-center text-[13px] text-muted">
-              {status.alive ? M.testHint : M.pausedHint}
+              {status.alive ? M.testHint : canDownload ? M.pausedHint : M.lockedHint}
             </p>
 
             <DesignEditor
@@ -190,7 +206,16 @@ export function ManageView({
           transition={{ duration: 0.7, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
           className="space-y-5"
         >
-          <LifeCard code={code} status={status} now={now} mode={mode} onUpdate={update} notify={notify} />
+          <LifeCard
+            code={code}
+            status={status}
+            now={now}
+            mode={mode}
+            stripeKey={stripeKey}
+            onUpdate={update}
+            onActivated={activated}
+            notify={notify}
+          />
           <TargetCard code={code} onUpdate={update} notify={notify} />
           <StatsCard code={code} now={now} alive={status.alive} />
           <ManageLinkCard manageUrl={manageUrl} shortUrl={shortUrl} title={code.title} />
@@ -223,15 +248,16 @@ export function ManageView({
 function StatusPill({ phase }: { phase: ReturnType<typeof lifeStatus>["phase"] }) {
   const { t } = useI18n();
   const tone = {
-    trial: "bg-lime text-ink",
-    scheduled: "bg-kobalt text-white",
+    pending: "bg-ink/10 text-ink",
+    free: "bg-lime text-ink",
+    intro: "bg-lime text-ink",
     active: "bg-kobalt text-white",
     canceling: "bg-sun text-ink",
     expired: "bg-coral text-white",
   }[phase];
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold ${tone}`}>
-      <span className={`size-1.5 rounded-full bg-current ${phase === "expired" ? "" : "animate-blink"}`} />
+      <span className={`size-1.5 rounded-full bg-current ${phase === "expired" || phase === "pending" ? "" : "animate-blink"}`} />
       {t.status[phase]}
     </span>
   );

@@ -1,32 +1,49 @@
 import Link from "next/link";
-import { brand } from "@/lib/site";
 
-export function LogoMark({ className = "size-9" }: { className?: string }) {
+/**
+ * The GenerateMyQRCodes mark: the three finder patterns of a QR code and a lime spark in the fourth corner.
+ * The same drawing is app/icon.svg (favicon, app icons – `npm run icons`).
+ */
+export function LogoMark({ className = "size-9", variant = "dark" }: { className?: string; variant?: "dark" | "light" }) {
+  const bg = variant === "dark" ? "#16161d" : "#f3f0e8";
+  const fg = variant === "dark" ? "#f3f0e8" : "#16161d";
+  const spark = variant === "dark" ? "#c6f03c" : "#2f45ff";
   return (
-    <svg viewBox="0 0 36 36" className={className} aria-hidden>
-      <rect x="1" y="1" width="34" height="34" rx="10" fill="#16161d" />
+    <svg viewBox="0 0 64 64" className={className} aria-hidden>
+      <rect width="64" height="64" rx="16" fill={bg} />
+      <g fill="none" stroke={fg} strokeWidth="4.5">
+        <rect x="12" y="12" width="15" height="15" rx="4.5" />
+        <rect x="37" y="12" width="15" height="15" rx="4.5" />
+        <rect x="12" y="37" width="15" height="15" rx="4.5" />
+      </g>
+      <g fill={fg}>
+        <rect x="17" y="17" width="5" height="5" rx="1.5" />
+        <rect x="42" y="17" width="5" height="5" rx="1.5" />
+        <rect x="17" y="42" width="5" height="5" rx="1.5" />
+      </g>
       <path
-        d="M9 13.5A4.5 4.5 0 0 1 13.5 9h9a4.5 4.5 0 0 1 4.5 4.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 9 22.5v-9Zm3 .5v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2Z"
-        fill="#f3f0e8"
-      />
-      <rect
-        x="14.5"
-        y="14.5"
-        width="7"
-        height="7"
-        rx="2"
-        fill="#c6f03c"
+        d="M44.5 33.5c.9 6.4 3.2 8.7 9.6 9.6-6.4.9-8.7 3.2-9.6 9.6-.9-6.4-3.2-8.7-9.6-9.6 6.4-.9 8.7-3.2 9.6-9.6Z"
+        fill={spark}
         className="origin-center transition-transform duration-500 [transform-box:fill-box] group-hover:rotate-90"
       />
     </svg>
   );
 }
 
+/** The wordmark: “GenerateMy” + “QR” in the accent colour + “Codes”. */
+export function Wordmark({ className = "", accent = "text-kobalt" }: { className?: string; accent?: string }) {
+  return (
+    <span className={`display leading-none tracking-[-0.03em] ${className}`}>
+      GenerateMy<span className={accent}>QR</span>Codes
+    </span>
+  );
+}
+
 export function Logo({ href, label }: { href: string; label: string }) {
   return (
-    <Link href={href} className="group flex items-center gap-2.5" aria-label={label}>
-      <LogoMark />
-      <span className="display text-[19px] leading-none">{brand.name}</span>
+    <Link href={href} className="group flex min-w-0 items-center gap-2.5" aria-label={label}>
+      <LogoMark className="size-9 shrink-0" />
+      <Wordmark className="truncate text-[15px] sm:text-[18px]" />
     </Link>
   );
 }

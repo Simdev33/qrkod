@@ -1,3 +1,4 @@
+import { PLAN } from "@/lib/site";
 import { INTL_LOCALE, type Locale } from "./config";
 
 // Nyelvfüggő formázás és a szótárbejegyzések kitöltése. Kliensen és szerveren is használható.
@@ -31,8 +32,22 @@ export const formatDate = (lang: Locale, ms: number) =>
 export const formatShortDate = (lang: Locale, ms: number) =>
   new Intl.DateTimeFormat(INTL_LOCALE[lang], { month: "short", day: "numeric", timeZone: TZ }).format(ms);
 
-export const formatUsd = (lang: Locale, amount: number) =>
-  new Intl.NumberFormat(INTL_LOCALE[lang], { style: "currency", currency: "USD" }).format(amount);
+/** An amount in the plan’s currency, written the way the language writes it (€1 / 1 € / 3,99 €). */
+export const formatMoney = (lang: Locale, cents: number) =>
+  new Intl.NumberFormat(INTL_LOCALE[lang], {
+    style: "currency",
+    currency: PLAN.currency,
+    currencyDisplay: "narrowSymbol",
+    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+  }).format(cents / 100);
+
+/** The price placeholders of the dictionaries and legal texts: {intro} {monthly} {days} {next}. */
+export const priceVars = (lang: Locale) => ({
+  intro: formatMoney(lang, PLAN.introCents),
+  monthly: formatMoney(lang, PLAN.monthlyCents),
+  days: PLAN.introDays,
+  next: PLAN.introDays + 1,
+});
 
 /** „5 perce”, „tegnap”, „3 hete”… az Intl.RelativeTimeFormat saját fordításával. */
 export function formatAgo(lang: Locale, ms: number, now: number) {

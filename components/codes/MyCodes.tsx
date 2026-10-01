@@ -16,8 +16,9 @@ import type { CodeView } from "@/lib/types";
 type State = { loading: true } | { loading: false; codes: CodeView[]; now: number };
 
 const TONE: Record<Phase, string> = {
-  trial: "bg-lime text-ink",
-  scheduled: "bg-kobalt text-white",
+  pending: "bg-ink/10 text-ink",
+  free: "bg-lime text-ink",
+  intro: "bg-lime text-ink",
   active: "bg-kobalt text-white",
   canceling: "bg-sun text-ink",
   expired: "bg-coral text-white",
@@ -123,7 +124,7 @@ function CodeCard({ code, now, origin, index }: { code: CodeView; now: number; o
         <div className="flex min-w-0 flex-1 flex-col">
           <span className={`self-start rounded-full px-2.5 py-1 text-[12px] font-semibold ${TONE[s.phase]}`}>
             {t.status[s.phase]}
-            {s.alive && s.phase !== "active" && s.phase !== "scheduled" ? ` · ${plural(M.daysLeft, s.daysLeft)}` : ""}
+            {s.alive && s.phase !== "active" ? ` · ${plural(M.daysLeft, s.daysLeft)}` : ""}
           </span>
           <div className="mt-2 truncate text-[17px] font-semibold tracking-tight">{code.title || t.manage.untitled}</div>
           <div className="truncate font-mono text-[13px] text-muted">{prettyUrl(code.target)}</div>
@@ -143,7 +144,7 @@ function CodeCard({ code, now, origin, index }: { code: CodeView; now: number; o
 }
 
 function Empty() {
-  const { t, l } = useI18n();
+  const { t, l, fill } = useI18n();
   const M = t.myCodes;
   return (
     <motion.div
@@ -162,7 +163,7 @@ function Empty() {
         ))}
       </div>
       <h2 className="display mt-7 text-2xl">{M.emptyTitle}</h2>
-      <p className="mt-2 max-w-md text-muted">{M.emptyText}</p>
+      <p className="mt-2 max-w-md text-muted">{fill(M.emptyText)}</p>
       <Link href={l("/#create")} className="btn btn-primary mt-7">
         {M.emptyCta} <IconArrowRight className="size-5" />
       </Link>

@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import { IconArrowRight, IconCheck } from "@/components/ui/Icons";
 import { Reveal } from "@/components/ui/Reveal";
 import { useI18n } from "@/lib/i18n/client";
-import { pricing } from "@/lib/site";
+import { PLAN } from "@/lib/site";
 
 
 export function Pricing() {
-  const { t, l, fill } = useI18n();
+  const { t, l, fill, money } = useI18n();
   const P = t.pricing;
   return (
     <section id="pricing" className="mx-auto max-w-6xl scroll-mt-24 px-4 pt-24 sm:px-5 sm:pt-32">
@@ -28,9 +28,9 @@ export function Pricing() {
           <div className="card relative h-full overflow-hidden p-7 sm:p-10">
             <div className="pointer-events-none absolute -right-16 -bottom-24 size-80 rounded-full bg-kobalt-soft blur-2xl" />
             <div className="relative">
-              <span className="rounded-full bg-lime px-3 py-1 text-[13px] font-bold">{fill(P.trialBadge, { n: pricing.trialDays })}</span>
+              <span className="rounded-full bg-lime px-3 py-1 text-[13px] font-bold">{fill(P.trialBadge)}</span>
               <div className="mt-6 flex items-end gap-3">
-                <span className="display text-[clamp(5rem,14vw,8.5rem)] leading-[0.8]">{P.amount}</span>
+                <span className="display text-[clamp(5rem,14vw,8.5rem)] leading-[0.8]">{money(PLAN.monthlyCents)}</span>
                 <span className="pb-2 text-lg leading-tight text-muted">
                   {P.perMonth}
                   <br />
@@ -38,7 +38,7 @@ export function Pricing() {
                 </span>
               </div>
               <p className="mt-6 max-w-md leading-relaxed text-ink-2">
-                {fill(P.lead, { n: pricing.trialDays })}
+                {fill(P.lead)}
               </p>
               <ul className="mt-7 grid gap-2.5 sm:grid-cols-2">
                 {P.included.map((item) => (
@@ -65,12 +65,12 @@ export function Pricing() {
 }
 
 function Calculator() {
-  const { t, fill } = useI18n();
+  const { t, fill, money } = useI18n();
   const C = t.pricing.calc;
   const [n, setN] = useState(5);
   const monthly = useMotionValue(n);
-  const monthlyText = useTransform(monthly, (v) => fill(C.money, { n: Math.round(v) }));
-  const yearlyText = useTransform(monthly, (v) => fill(C.money, { n: Math.round(v) * 12 }));
+  const monthlyText = useTransform(monthly, (v) => money(Math.round(v) * PLAN.monthlyCents));
+  const yearlyText = useTransform(monthly, (v) => money(Math.round(v) * PLAN.monthlyCents * 12));
 
   useEffect(() => {
     const c = animate(monthly, n, { duration: 0.5, ease: [0.16, 1, 0.3, 1] });
@@ -107,7 +107,7 @@ function Calculator() {
           <motion.div className="display mt-1 text-3xl">{yearlyText}</motion.div>
         </div>
       </div>
-      <p className="mt-4 text-[13px] text-paper/50">{C.note}</p>
+      <p className="mt-4 text-[13px] text-paper/50">{fill(C.note)}</p>
     </div>
   );
 }

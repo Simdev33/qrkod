@@ -8,7 +8,7 @@ import { DEFAULT_DESIGN } from "@/lib/design";
 import { useI18n } from "@/lib/i18n/client";
 
 export function CtaBand({ origin }: { origin: string }) {
-  const { t, l } = useI18n();
+  const { t, l, fill } = useI18n();
   return (
     <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-5 sm:pt-32">
       <Reveal>
@@ -21,7 +21,7 @@ export function CtaBand({ origin }: { origin: string }) {
                 <br />
                 {t.cta.titleLine2}
               </h2>
-              <p className="mt-4 max-w-lg text-lg text-ink-2">{t.cta.lead}</p>
+              <p className="mt-4 max-w-lg text-lg text-ink-2">{fill(t.cta.lead)}</p>
               <Link href={l("/#create")} className="btn btn-ink mt-8 px-6 py-4 text-base">
                 {t.cta.button} <IconArrowRight className="size-5" />
               </Link>

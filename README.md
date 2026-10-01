@@ -1,43 +1,51 @@
-# Kockakód – dinamikus QR-kód készítő
+# GenerateMyQRCodes – dynamic QR codes
 
-A QR-kód egy rövid linket tartalmaz (`/q/<kód>`), ami a megadott címre irányít tovább. Minden kód 30 napig
-ingyen működik, utána havi 1 $-os Stripe-előfizetéssel él tovább; előfizetés nélkül szünetel.
+generatemyqrcodes.com · operated by TourCierge s. r. o.
 
-Next.js 16 · Tailwind v4 · Motion · Turso (libSQL) · Stripe
+Every QR code contains a short link (`/q/<code>`) that forwards to the destination you set – the destination can
+be changed at any time. Designing and previewing a code are free; to make it work (and to download it) it is
+activated with its own Stripe subscription: **€1 for the first 7 days, then €3.99 a month per code**. Without a
+live subscription the code pauses.
 
-## Helyi futtatás
+Next.js 16 · Tailwind v4 · Motion · Turso (libSQL) · Stripe (Checkout Sessions, `ui_mode: "elements"`)
+
+## Local development
 
 ```bash
 npm install
 npm run dev   # http://localhost:3244
 ```
 
-Környezeti változók nélkül is fut: az adatok a `data/kockakod.db` fájlba kerülnek, a fizetés helyett pedig
-demó fizetőoldal és „időutazás” gombok vannak a kezelőoldalon.
+Without environment variables it still runs: data goes to `data/kockakod.db`, and instead of the payment form a
+demo activation and “time travel” buttons appear on the management page. With Stripe test keys in `.env.local`,
+the real payment form is used (test card 4242 4242 4242 4242).
 
-## Élesítés Vercelen
+## Going live on Vercel
 
-1. **Turso:** hozz létre egy adatbázist (európai régióban), és készíts hozzá tokent.
-2. **Vercel → Settings → Environment Variables:** töltsd ki a [.env.example](.env.example) változóit
-   (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `CREATOR_SALT`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`).
-3. **Vercel → Settings → Functions → Region:** az adatbázishoz legközelebbi régió. A jelenlegi Turso-adatbázis
-   `aws-eu-west-1` (Írország), ehhez a Vercel `dub1` (Dublin) régiója illik.
-4. **Stripe → Webhooks:** végpont `https://<domain>/api/stripe/webhook`, az `.env.example`-ben felsorolt
-   eseményekkel; a signing secret megy a `STRIPE_WEBHOOK_SECRET`-be.
-5. Deploy. A táblák az első kéréskor maguktól létrejönnek.
+1. **Turso:** a database (ideally in an EU region) and a token.
+2. **Vercel → Settings → Environment Variables:** see [.env.example](.env.example) (`TURSO_DATABASE_URL`,
+   `TURSO_AUTH_TOKEN`, `CREATOR_SALT`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`,
+   `STRIPE_WEBHOOK_SECRET`).
+3. **Vercel → Settings → Functions → Region:** the region closest to the database (Turso `aws-eu-west-1` →
+   Vercel `dub1`).
+4. **Stripe → Webhooks:** endpoint `https://generatemyqrcodes.com/api/stripe/webhook` with the events listed in
+   `.env.example`; its signing secret goes into `STRIPE_WEBHOOK_SECRET`.
+5. **Stripe → Settings → Payment methods:** register the domain for Apple Pay / Google Pay (the express buttons
+   only appear over HTTPS on a registered domain).
 
-A QR-kódokba a projekt éles domainje kerül (`VERCEL_PROJECT_PRODUCTION_URL`, a Vercel magától adja): saját
-domain esetén az, különben a `*.vercel.app` cím. Ha később saját domaint kötsz be, az új kódok azt kapják, a régiek
-a `vercel.app` címen működnek tovább – ezt a címet ezért ne vedd le a projektről.
+The QR codes contain the project’s production domain (`VERCEL_PROJECT_PRODUCTION_URL`, set by Vercel): the custom
+domain if there is one, otherwise the `*.vercel.app` address. Codes created on the `vercel.app` address keep working
+there – don’t remove that address from the project.
 
-## Nyelvek és jogi szövegek
+## Languages and legal texts
 
-- Öt nyelv: magyar, angol, német, francia, spanyol. Minden oldal `/<nyelv>/…` alatt él; a `proxy.ts` a nyelv
-  nélküli címeket a látogató nyelvére irányítja (süti → böngésző nyelve → angol). A QR-kódok rövid linkjei
-  (`/q/<kód>`) nyelvfüggetlenek.
-- Felületi szövegek: `lib/i18n/dictionaries/` (a `hu.ts` az eredeti, a típusa kötelezővé teszi a többi nyelvben is
-  ugyanazokat a kulcsokat).
-- ÁSZF és Adatkezelési tájékoztató: `lib/i18n/legal/` (a magyar az irányadó). A szolgáltató adatait, az áfa-mondatot
-  és a hatálybalépés dátumát a `lib/legal.ts`-ben kell kitölteni — amíg szögletes zárójeles helyőrző maradt, az
-  oldalakon figyelmeztetés látszik.
-
+- English is the main language, without a prefix (`/`, `/terms`, `/manage/…`); Hungarian, German, French and
+  Spanish live under `/hu`, `/de`, `/fr`, `/es`. `proxy.ts` rewrites the unprefixed addresses to `/en/…`, and `/`
+  follows the language switcher’s cookie or the browser language on the first visit.
+- UI texts: `lib/i18n/dictionaries/` (`en.ts` is the source and defines the `Dictionary` type). Prices are
+  placeholders (`{intro}`, `{monthly}`, `{days}`, `{next}`), formatted per language from `PLAN` in `lib/site.ts`.
+- Terms of Service and Privacy Policy: `lib/i18n/legal/` (the English text is the source and prevails). Operator,
+  processors and the effective date are in `lib/legal.ts` – **the contact email is still missing** (the pages show
+  “to be completed” until it is set in `lib/site.ts` → `brand.email`).
+- Icons: `app/icon.svg` is the source; `npm run icons` regenerates `favicon.ico`, `apple-icon.png` and the manifest
+  icons.

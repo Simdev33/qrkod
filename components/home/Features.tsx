@@ -17,13 +17,13 @@ const SHOWCASE: Design[] = [
 ];
 
 export function Features() {
-  const { t } = useI18n();
+  const { t, fill } = useI18n();
   const F = t.features;
   return (
     <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-5 sm:pt-32">
       <Reveal className="max-w-3xl">
         <span className="eyebrow">{F.eyebrow}</span>
-        <h2 className="display mt-5 text-[clamp(2rem,4.6vw,3.6rem)] leading-[0.98]">{F.title}</h2>
+        <h2 className="display mt-5 text-[clamp(2rem,4.6vw,3.6rem)] leading-[0.98]">{fill(F.title)}</h2>
       </Reveal>
 
       <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2">

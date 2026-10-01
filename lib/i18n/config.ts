@@ -1,35 +1,36 @@
-// Támogatott nyelvek. Az URL mindig nyelvi előtaggal kezdődik (/hu, /en, …), kivéve a QR-kódokba írt
-// rövid linkeket (/q/<kód>), amik nyelvfüggetlenek — azok a böngésző nyelve alapján irányítanak.
+// Supported languages. English is the main language and lives at the root without a prefix (/, /terms,
+// /manage/…); the others have a prefix (/hu, /de/terms…). Internally every page is served from /<lang>/…,
+// the proxy rewrites the unprefixed addresses to /en/…. The QR codes’ short links (/q/<code>) are
+// language-independent.
 
-export const LOCALES = ["hu", "en", "de", "fr", "es"] as const;
+export const LOCALES = ["en", "hu", "de", "fr", "es"] as const;
 export type Locale = (typeof LOCALES)[number];
 
-/** Ha a böngésző egyik támogatott nyelvet sem kéri. */
 export const DEFAULT_LOCALE: Locale = "en";
 
 export const LOCALE_COOKIE = "NEXT_LOCALE";
 
 export const LOCALE_NAMES: Record<Locale, string> = {
-  hu: "Magyar",
   en: "English",
+  hu: "Magyar",
   de: "Deutsch",
   fr: "Français",
   es: "Español",
 };
 
-/** Az Intl-formázók (dátum, szám) területi beállítása. */
+/** Locale of the Intl formatters (dates, numbers, money). */
 export const INTL_LOCALE: Record<Locale, string> = {
-  hu: "hu-HU",
   en: "en-GB",
+  hu: "hu-HU",
   de: "de-DE",
   fr: "fr-FR",
   es: "es-ES",
 };
 
-/** Open Graph területi kód. */
+/** Open Graph locale. */
 export const OG_LOCALE: Record<Locale, string> = {
-  hu: "hu_HU",
   en: "en_GB",
+  hu: "hu_HU",
   de: "de_DE",
   fr: "fr_FR",
   es: "es_ES",
@@ -38,7 +39,7 @@ export const OG_LOCALE: Record<Locale, string> = {
 export const hasLocale = (value: string | undefined | null): value is Locale =>
   !!value && (LOCALES as readonly string[]).includes(value);
 
-/** Accept-Language fejlécből a legjobban illeszkedő támogatott nyelv. */
+/** The best supported language for an Accept-Language header. */
 export function matchAcceptLanguage(header: string | null | undefined): Locale | null {
   if (!header) return null;
   const ranked = header
@@ -57,15 +58,28 @@ export function matchAcceptLanguage(header: string | null | undefined): Locale |
   return null;
 }
 
-/** A látogató nyelve: korábbi választás (süti) → böngésző nyelve → alapértelmezés. */
+/** The visitor’s language: earlier choice (cookie) → browser language → English. */
 export function pickLocale(cookie: string | undefined | null, acceptLanguage: string | null | undefined): Locale {
   if (hasLocale(cookie)) return cookie;
   return matchAcceptLanguage(acceptLanguage) ?? DEFAULT_LOCALE;
 }
 
-/** Nyelvi előtaggal ellátott belső útvonal: localePath("de", "/terms") → "/de/terms". */
+/**
+ * An internal path in a language: English without a prefix, the others with one.
+ * localePath("de", "/terms") → "/de/terms"; localePath("en", "/terms") → "/terms"; localePath("hu", "/#faq") → "/hu#faq".
+ */
 export function localePath(lang: Locale, path = "/") {
-  if (path === "/" || path === "") return `/${lang}`;
-  if (path.startsWith("#")) return `/${lang}${path}`;
-  return `/${lang}${path.startsWith("/") ? path : `/${path}`}`;
+  let p = path || "/";
+  if (p.startsWith("#") || p.startsWith("?")) p = `/${p}`;
+  if (!p.startsWith("/")) p = `/${p}`;
+  if (lang === DEFAULT_LOCALE) return p;
+  if (p === "/") return `/${lang}`;
+  if (p.startsWith("/#") || p.startsWith("/?")) return `/${lang}${p.slice(1)}`;
+  return `/${lang}${p}`;
+}
+
+/** The path without its language prefix (the English form of the address). */
+export function stripLocale(pathname: string) {
+  const first = pathname.split("/")[1];
+  return hasLocale(first) ? pathname.slice(first.length + 1) || "/" : pathname;
 }

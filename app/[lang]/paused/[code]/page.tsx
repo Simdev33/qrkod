@@ -5,7 +5,7 @@ import { SleepingQr } from "@/components/qr/SleepingQr";
 import { LogoMark } from "@/components/site/Logo";
 import { sanitizeDesign } from "@/lib/design";
 import { hasLocale, localePath } from "@/lib/i18n/config";
-import { getDictionary } from "@/lib/i18n/server";
+import { fillText, getDictionary } from "@/lib/i18n/server";
 import { getById, isAlive } from "@/lib/server/codes";
 import { currentOrigin } from "@/lib/server/request";
 import { brand } from "@/lib/site";
@@ -42,7 +42,7 @@ export default async function PausedPage({ params }: PageProps<"/[lang]/paused/[
       <Link href={localePath(lang)} className="group relative mt-8 flex items-center gap-2.5 text-sm text-muted hover:text-ink">
         <LogoMark className="size-7" />
         <span>
-          {t.promo} <span className="font-semibold text-ink underline-offset-4 group-hover:underline">{brand.name}</span> – {t.promoSuffix}
+          {t.promo} <span className="font-semibold text-ink underline-offset-4 group-hover:underline">{brand.name}</span> – {fillText(lang, t.promoSuffix)}
         </span>
       </Link>
     </main>

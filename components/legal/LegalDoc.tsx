@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Rich } from "@/components/ui/Rich";
 import { localePath, type Locale } from "@/lib/i18n/config";
-import { fill, formatDate } from "@/lib/i18n/format";
+import { fill, formatDate, priceVars } from "@/lib/i18n/format";
 import { getDictionary, getLegal } from "@/lib/i18n/server";
-import { isPlaceholder, LEGAL_EFFECTIVE_DATE, legalVars, operator } from "@/lib/legal";
+import { isPlaceholder, LEGAL_EFFECTIVE_DATE, legalIncomplete, legalVars, operator } from "@/lib/legal";
 
 type Kind = "terms" | "privacy";
 
@@ -13,11 +13,11 @@ export function LegalDoc({ lang, kind, siteUrl }: { lang: Locale; kind: Kind; si
   const doc = legal[kind];
 
   // A kitöltetlen szolgáltatói adatokat <ph> jelöléssel kiemeljük.
-  const raw = legalVars(siteUrl.replace(/^https?:\/\//, ""), dict.common.price);
+  const raw = legalVars(siteUrl.replace(/^https?:\/\//, ""), priceVars(lang));
   const vars = Object.fromEntries(
     Object.entries(raw).map(([k, v]) => [k, typeof v === "string" && isPlaceholder(v) ? `<ph>${v}</ph>` : v]),
   );
-  const hasPlaceholders = Object.values(operator).some((v) => isPlaceholder(v));
+  const hasPlaceholders = legalIncomplete();
   const text = (s: string) => (
     <Rich
       text={fill(s, vars)}
@@ -95,9 +95,13 @@ export function LegalDoc({ lang, kind, siteUrl }: { lang: Locale; kind: Kind; si
       </div>
 
       <div className="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-ink/10 pt-6 text-sm">
-        <a href={`mailto:${operator.email}`} className="font-semibold text-ink">
-          {operator.email}
-        </a>
+        {operator.email ? (
+          <a href={`mailto:${operator.email}`} className="font-semibold text-ink">
+            {operator.email}
+          </a>
+        ) : (
+          <span className="text-muted">{operator.name}</span>
+        )}
         <Link href={localePath(lang, `/${other}`)} className="font-semibold text-kobalt hover:underline">
           {dict.meta[other]} →
         </Link>

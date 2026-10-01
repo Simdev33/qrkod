@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { TOKEN_RE } from "@/lib/ids";
-import { createCheckout, portalUrl, setCancelAtPeriodEnd } from "@/lib/server/billing";
+import { completeCheckout, createCheckout, isEmail, normalizeEmail, portalUrl, setCancelAtPeriodEnd } from "@/lib/server/billing";
 import { getByToken, toView } from "@/lib/server/codes";
-import { originOf } from "@/lib/server/request";
+import { limited } from "@/lib/server/rate-limit";
+import { clientIp, originOf } from "@/lib/server/request";
 import { langOf, readJson } from "@/lib/server/validate";
 import { isSubscribed } from "@/lib/status";
 
-// Hibánál a szótár errors-kulcsát küldjük vissza; a Stripe saját (angol) hibaüzenetét csak naplózzuk.
+// Errors are sent back as dictionary keys (errors.*); Stripe’s own messages are only logged.
 const KNOWN = new Set(["payments_off", "payment_failed", "no_subscription", "no_customer"]);
 
 export async function POST(req: Request, ctx: RouteContext<"/api/codes/[token]/billing">) {
@@ -19,11 +20,23 @@ export async function POST(req: Request, ctx: RouteContext<"/api/codes/[token]/b
 
   try {
     switch (body.action) {
+      // The payment form: a Checkout Session for this code (email first, like the other TourCierge sites).
       case "checkout": {
         if (isSubscribed(row.sub_status)) return NextResponse.json({ error: "already_subscribed" }, { status: 409 });
-        // Az ÁSZF elfogadása és az azonnali teljesítés kérése (elállási jog) nélkül nem indulhat fizetés.
-        if (body.consent !== true) return NextResponse.json({ error: "consent_required" }, { status: 400 });
-        return NextResponse.json({ url: await createCheckout(row, origin, lang) });
+        const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
+        if (!isEmail(email)) return NextResponse.json({ error: "invalid_email" }, { status: 400 });
+        if (limited(`checkout:${clientIp(req)}`, 20, 15 * 60_000)) {
+          return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+        }
+        return NextResponse.json({ clientSecret: await createCheckout(row, email, origin, lang) });
+      }
+      // After a successful payment: the subscription is written onto the code right away (the webhook also does it).
+      case "complete": {
+        const sessionId = typeof body.sessionId === "string" ? body.sessionId : "";
+        if (!(await completeCheckout(sessionId, row))) {
+          return NextResponse.json({ error: "payment_incomplete" }, { status: 402 });
+        }
+        return NextResponse.json({ code: await toView((await getByToken(token))!) });
       }
       case "cancel":
       case "resume": {

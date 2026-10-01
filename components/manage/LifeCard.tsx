@@ -1,19 +1,20 @@
 "use client";
 
-import { animate, AnimatePresence, motion, useMotionValue, useTransform } from "motion/react";
+import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { useEffect, useState } from "react";
-import { IconArrowRight, IconCard, IconCheck } from "@/components/ui/Icons";
+import { IconCard } from "@/components/ui/Icons";
 import { Rich } from "@/components/ui/Rich";
 import { api, errorCode } from "@/lib/api";
 import { useI18n } from "@/lib/i18n/client";
-import { DAY, pricing } from "@/lib/site";
-import type { LifeStatus } from "@/lib/status";
+import type { LifeStatus, Phase } from "@/lib/status";
 import type { CodeView, PaymentMode } from "@/lib/types";
 import type { Notify } from "./ManageView";
+import { PaymentPanel } from "./PaymentPanel";
 
-const RING = {
-  trial: "#9ccc12",
-  scheduled: "#2f45ff",
+const RING: Record<Phase, string> = {
+  pending: "#b9b4a8",
+  free: "#9ccc12",
+  intro: "#9ccc12",
   active: "#2f45ff",
   canceling: "#f0a800",
   expired: "#ff5a3c",
@@ -24,32 +25,30 @@ export function LifeCard({
   status,
   now,
   mode,
+  stripeKey,
   onUpdate,
+  onActivated,
   notify,
 }: {
   code: CodeView;
   status: LifeStatus;
   now: number;
   mode: PaymentMode;
+  stripeKey: string;
   onUpdate: (c: CodeView) => void;
+  onActivated: (c: CodeView) => void;
   notify: Notify;
 }) {
-  const { t, l, lang, fill, plural, date, error: errorText } = useI18n();
+  const { t, lang, fill, plural, date, error: errorText } = useI18n();
   const T = t.manage.life;
   const [busy, setBusy] = useState<string | null>(null);
-  const [consent, setConsent] = useState(false);
-  const [consentMissing, setConsentMissing] = useState(false);
   const { phase } = status;
 
-  async function billing(action: "checkout" | "cancel" | "resume" | "portal") {
-    if (action === "checkout" && !consent) {
-      setConsentMissing(true);
-      return;
-    }
+  async function billing(action: "cancel" | "resume" | "portal") {
     setBusy(action);
     try {
-      if (action === "checkout" || action === "portal") {
-        const { url } = await api<{ url: string }>(`/api/codes/${code.token}/billing`, "POST", { action, lang, consent });
+      if (action === "portal") {
+        const { url } = await api<{ url: string }>(`/api/codes/${code.token}/billing`, "POST", { action, lang });
         window.location.href = url;
         return;
       }
@@ -62,50 +61,55 @@ export function LifeCard({
     setBusy(null);
   }
 
-  // Gyűrű: mennyi van hátra az aktuális (ingyenes vagy fizetett) időszakból.
-  const ring = status.alive ? Math.min(1, Math.max(0.02, (status.activeUntil - now) / (pricing.trialDays * DAY))) : 0;
-  const trialShort = code.trialEndsAt - now < 49 * 60 * 60 * 1000;
-  const rich = (text: string) => <Rich text={text} />;
+  // The ring: how much is left of the current period.
+  const ring = status.alive ? Math.min(1, Math.max(0.02, (status.activeUntil - now) / status.periodLength)) : 0;
+  const rich = (text: string, when: number) => <Rich text={fill(text, { date: date(when) })} />;
 
   let heading: string;
   let text: React.ReactNode;
-  if (phase === "trial") {
-    heading = plural(T.trialHeading, status.daysLeft);
-    text = trialShort
-      ? fill(T.trialSoon, { date: date(code.trialEndsAt) })
-      : rich(fill(T.trialText, { date: date(code.trialEndsAt) }));
-  } else if (phase === "scheduled") {
-    heading = T.scheduledHeading;
-    text = rich(fill(T.scheduledText, { date: date(code.trialEndsAt) }));
-  } else if (phase === "active") {
-    heading = T.activeHeading;
-    text = rich(fill(T.activeText, { date: date(status.nextCharge ?? status.activeUntil) }));
-  } else if (phase === "canceling") {
-    heading = plural(T.cancelingHeading, status.daysLeft);
-    text = rich(fill(T.cancelingText, { date: date(status.activeUntil) }));
-  } else {
-    heading = T.expiredHeading;
-    text = (
-      <>
-        {rich(fill(T.expiredText, { date: date(status.activeUntil) }))}{" "}
-        {code.missedScans > 0 ? plural(T.missed, code.missedScans) : T.noMissed} {T.reviveNote}
-      </>
-    );
+  switch (phase) {
+    case "pending":
+      heading = T.pendingHeading;
+      text = fill(T.pendingText);
+      break;
+    case "free":
+      heading = plural(T.freeHeading, status.daysLeft);
+      text = rich(T.freeText, code.trialEndsAt);
+      break;
+    case "intro":
+      heading = plural(T.introHeading, status.daysLeft);
+      text = rich(T.introText, status.nextCharge ?? status.activeUntil);
+      break;
+    case "active":
+      heading = T.activeHeading;
+      text = rich(T.activeText, status.nextCharge ?? status.activeUntil);
+      break;
+    case "canceling":
+      heading = plural(T.cancelingHeading, status.daysLeft);
+      text = rich(T.cancelingText, status.activeUntil);
+      break;
+    default:
+      heading = T.expiredHeading;
+      text = (
+        <>
+          {rich(T.expiredText, status.activeUntil)} {code.missedScans > 0 ? plural(T.missed, code.missedScans) : T.noMissed}{" "}
+          {T.reviveNote}
+        </>
+      );
   }
-
-  const canCheckout = !status.subscribed;
-  const checkoutLabel = phase === "expired" ? T.revive : phase === "canceling" ? T.resubscribe : T.subscribe;
 
   return (
     <div className="card relative overflow-hidden p-6 sm:p-7">
-      {phase === "expired" && <div className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-coral/15 blur-3xl" />}
+      {(phase === "expired" || phase === "pending") && (
+        <div className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-lime/25 blur-3xl" />
+      )}
       <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center">
         <Ring
           value={ring}
           color={RING[phase]}
           days={status.daysLeft}
-          expired={!status.alive}
-          label={status.alive ? plural(T.ringLeft, status.daysLeft) : T.ringPaused}
+          off={!status.alive}
+          label={status.alive ? plural(T.ringLeft, status.daysLeft) : phase === "pending" ? T.ringPending : T.ringPaused}
         />
         <div className="min-w-0 flex-1">
           <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
@@ -113,93 +117,45 @@ export function LifeCard({
         </div>
       </div>
 
-      {canCheckout && mode !== "off" && (
-        <label
-          className={`relative mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 text-[13px] leading-relaxed transition-colors ${
-            consentMissing && !consent ? "border-coral bg-coral-soft/50" : "border-ink/10 bg-paper/70"
-          }`}
-        >
-          <input
-            type="checkbox"
-            checked={consent}
-            onChange={(e) => {
-              setConsent(e.target.checked);
-              setConsentMissing(false);
-            }}
-            className="peer sr-only"
+      {!status.subscribed ? (
+        <div className="relative">
+          <PaymentPanel
+            code={code}
+            firstActivation={status.firstActivation}
+            mode={mode}
+            stripeKey={stripeKey}
+            onActivated={onActivated}
+            showTitle={phase !== "pending"}
           />
-          <span
-            className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border-[1.5px] transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-kobalt ${
-              consent ? "border-ink bg-ink text-lime" : "border-ink/30 bg-white"
-            }`}
-            aria-hidden
-          >
-            {consent && <IconCheck className="size-3.5" strokeWidth={3.5} />}
-          </span>
-          <span className="text-ink-2">
-            <Rich text={T.consent} links={{ terms: l("/terms") }} />
-          </span>
-        </label>
-      )}
-      <AnimatePresence>
-        {consentMissing && !consent && (
-          <motion.p
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="relative overflow-hidden pt-2 text-sm font-medium text-coral-deep"
-            role="alert"
-          >
-            {T.consentRequired}
-          </motion.p>
-        )}
-      </AnimatePresence>
-
-      <div className="relative mt-5 flex flex-wrap items-center gap-2">
-        {canCheckout && (
-          <button
-            type="button"
-            disabled={mode === "off" || !!busy}
-            onClick={() => billing("checkout")}
-            className={`btn ${phase === "expired" ? "btn-lime" : "btn-primary"} px-6 py-3.5`}
-          >
-            {busy === "checkout" ? T.redirecting : checkoutLabel}
-            <IconArrowRight className="size-5" />
-          </button>
-        )}
-        {status.subscribed && !code.cancelAtPeriodEnd && (
-          <button type="button" className="btn btn-ghost" disabled={!!busy} onClick={() => billing("cancel")}>
-            {busy === "cancel" ? T.canceling : T.cancel}
-          </button>
-        )}
-        {status.subscribed && code.cancelAtPeriodEnd && (
-          <button type="button" className="btn btn-primary" disabled={!!busy} onClick={() => billing("resume")}>
-            {busy === "resume" ? T.resuming : T.resume}
-          </button>
-        )}
-        {mode === "stripe" && code.hasCustomer && (
-          <button type="button" className="btn btn-ghost" disabled={!!busy} onClick={() => billing("portal")}>
-            <IconCard className="size-4" /> {T.portal}
-          </button>
-        )}
-      </div>
-      {canCheckout && (
-        <p className="relative mt-3 text-[13px] text-muted">{mode === "off" ? T.off : mode === "demo" ? T.demo : T.secure}</p>
+        </div>
+      ) : (
+        <div className="relative mt-6 flex flex-wrap items-center gap-2">
+          {!code.cancelAtPeriodEnd ? (
+            <button type="button" className="btn btn-ghost" disabled={!!busy} onClick={() => billing("cancel")}>
+              {busy === "cancel" ? T.canceling : T.cancel}
+            </button>
+          ) : (
+            <button type="button" className="btn btn-primary" disabled={!!busy} onClick={() => billing("resume")}>
+              {busy === "resume" ? T.resuming : T.resume}
+            </button>
+          )}
+          {mode === "stripe" && code.hasCustomer && (
+            <button type="button" className="btn btn-ghost" disabled={!!busy} onClick={() => billing("portal")}>
+              <IconCard className="size-4" /> {T.portal}
+            </button>
+          )}
+        </div>
       )}
 
-      <dl className="relative mt-6 grid grid-cols-2 gap-3 border-t border-ink/10 pt-5 text-sm sm:grid-cols-3">
+      <dl className="relative mt-6 grid grid-cols-2 gap-3 border-t border-ink/10 pt-5 text-sm">
         <div>
           <dt className="text-muted">{T.created}</dt>
           <dd className="mt-0.5 font-medium">{date(code.createdAt)}</dd>
         </div>
-        <div>
-          <dt className="text-muted">{T.trialEnds}</dt>
-          <dd className="mt-0.5 font-medium">{date(code.trialEndsAt)}</dd>
-        </div>
-        {code.paidUntil && code.paidUntil > code.trialEndsAt && (
+        {status.activeUntil > code.createdAt && (
           <div>
             <dt className="text-muted">{T.paidUntil}</dt>
-            <dd className="mt-0.5 font-medium">{date(code.paidUntil)}</dd>
+            <dd className="mt-0.5 font-medium">{date(status.activeUntil)}</dd>
           </div>
         )}
       </dl>
@@ -207,7 +163,7 @@ export function LifeCard({
   );
 }
 
-function Ring({ value, color, days, expired, label }: { value: number; color: string; days: number; expired: boolean; label: string }) {
+function Ring({ value, color, days, off, label }: { value: number; color: string; days: number; off: boolean; label: string }) {
   const mv = useMotionValue(0);
   const shown = useTransform(mv, (v) => Math.round(v));
   const [n, setN] = useState(0);
@@ -237,7 +193,7 @@ function Ring({ value, color, days, expired, label }: { value: number; color: st
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">
         <div>
-          <div className="display text-4xl leading-none">{expired ? "0" : n}</div>
+          <div className="display text-4xl leading-none">{off ? "0" : n}</div>
           <div className="mt-1 max-w-[96px] text-[12px] leading-tight font-medium text-muted">{label}</div>
         </div>
       </div>

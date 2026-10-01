@@ -1,5 +1,5 @@
 import { after, NextResponse, type NextRequest } from "next/server";
-import { LOCALE_COOKIE, pickLocale } from "@/lib/i18n/config";
+import { LOCALE_COOKIE, localePath, pickLocale } from "@/lib/i18n/config";
 import { getById, isAlive, recordScan } from "@/lib/server/codes";
 import { originOf } from "@/lib/server/request";
 
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/q/[code]">) {
   const row = await getById(code.toLowerCase());
   const lang = pickLocale(req.cookies.get(LOCALE_COOKIE)?.value, req.headers.get("accept-language"));
   const paused = (id: string) =>
-    NextResponse.redirect(new URL(`/${lang}/paused/${encodeURIComponent(id)}`, originOf(req)), { status: 302, headers: noStore });
+    NextResponse.redirect(new URL(localePath(lang, `/paused/${encodeURIComponent(id)}`), originOf(req)), { status: 302, headers: noStore });
 
   if (!row) return paused(code);
 

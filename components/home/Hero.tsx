@@ -16,7 +16,7 @@ const PIXELS = [
 ];
 
 export function Hero({ children }: { children: React.ReactNode }) {
-  const { t } = useI18n();
+  const { t, fill } = useI18n();
   return (
     <section className="relative overflow-x-clip">
       <div
@@ -55,7 +55,7 @@ export function Hero({ children }: { children: React.ReactNode }) {
               <span className="absolute inset-0 animate-ping rounded-full bg-kobalt/60" />
               <span className="relative size-2 rounded-full bg-kobalt" />
             </span>
-            {t.hero.eyebrow}
+            {fill(t.hero.eyebrow)}
           </motion.span>
 
           <h1 className="display mt-6 text-[clamp(2.4rem,6vw,5.4rem)] leading-[0.94]">
@@ -76,7 +76,7 @@ export function Hero({ children }: { children: React.ReactNode }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Rich text={t.hero.lead} />
+            <Rich text={fill(t.hero.lead)} />
           </motion.p>
         </div>
 

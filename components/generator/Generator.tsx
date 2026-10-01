@@ -16,7 +16,7 @@ import { api, errorCode } from "@/lib/api";
 
 export function Generator({ origin, candidate: initialCandidate }: { origin: string; candidate: string }) {
   const router = useRouter();
-  const { t, l, error: errorText } = useI18n();
+  const { t, l, fill, error: errorText } = useI18n();
   const G = t.generator;
   const [raw, setRaw] = useState("");
   const [title, setTitle] = useState("");
@@ -164,12 +164,12 @@ export function Generator({ origin, candidate: initialCandidate }: { origin: str
         <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-[13px] text-ink-2">
           {G.perks.map((perk) => (
             <li key={perk} className="flex items-center gap-1.5">
-              <IconCheck className="size-3.5 text-kobalt" strokeWidth={3} /> {perk}
+              <IconCheck className="size-3.5 text-kobalt" strokeWidth={3} /> {fill(perk)}
             </li>
           ))}
         </ul>
         <p className="mt-3 text-center text-[12px] leading-relaxed text-muted">
-          <Rich text={G.consent} links={{ terms: l("/terms"), privacy: l("/privacy") }} linkClass="underline underline-offset-2 hover:text-ink" />
+          <Rich text={fill(G.consent)} links={{ terms: l("/terms"), privacy: l("/privacy") }} linkClass="underline underline-offset-2 hover:text-ink" />
         </p>
       </div>
     </form>

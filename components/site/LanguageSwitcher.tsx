@@ -5,12 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n/client";
-import { LOCALE_NAMES, LOCALES, type Locale } from "@/lib/i18n/config";
+import { LOCALE_COOKIE, LOCALE_NAMES, LOCALES, localePath, stripLocale, type Locale } from "@/lib/i18n/config";
 
-/** Az aktuális oldal címe egy másik nyelven (a nyelvi előtag cseréjével). */
+/** The current page in another language (English has no prefix). */
 function useSwitchHref() {
   const pathname = usePathname();
-  return (target: Locale) => `/${target}${pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "")}`;
+  return (target: Locale) => localePath(target, stripLocale(pathname));
+}
+
+/** The choice is remembered, so “/” and the QR codes’ pages open in this language next time. */
+function remember(lang: Locale) {
+  document.cookie = `${LOCALE_COOKIE}=${lang}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
 }
 
 function GlobeIcon() {
@@ -71,7 +76,10 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
                 href={href(l)}
                 hrefLang={l}
                 prefetch={false}
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  remember(l);
+                  setOpen(false);
+                }}
                 className={`flex items-center justify-between rounded-xl px-3 py-2 text-[15px] transition-colors ${
                   l === lang ? "bg-ink text-paper" : "text-ink-2 hover:bg-ink/5 hover:text-ink"
                 }`}
@@ -99,7 +107,10 @@ export function LanguageRow({ dark = false, onPick }: { dark?: boolean; onPick?:
           href={href(l)}
           hrefLang={l}
           prefetch={false}
-          onClick={onPick}
+          onClick={() => {
+            remember(l);
+            onPick?.();
+          }}
           title={LOCALE_NAMES[l]}
           className={`rounded-lg px-2.5 py-1 font-mono text-[12px] font-bold uppercase transition-colors ${
             l === lang

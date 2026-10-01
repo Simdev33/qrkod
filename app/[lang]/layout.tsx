@@ -5,7 +5,7 @@ import "../globals.css";
 import { I18nProvider } from "@/lib/i18n/client";
 import { hasLocale, LOCALES, OG_LOCALE } from "@/lib/i18n/config";
 import { alternates } from "@/lib/i18n/meta";
-import { getDictionary } from "@/lib/i18n/server";
+import { fillText, getDictionary } from "@/lib/i18n/server";
 import { brand } from "@/lib/site";
 
 const archivo = Archivo({
@@ -37,16 +37,17 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   const t = getDictionary(lang).meta;
   return {
     metadataBase: new URL(brand.url),
-    title: { default: `${t.title} · ${brand.name}`, template: `%s · ${brand.name}` },
-    description: t.description,
+    title: { default: `${fillText(lang, t.title)} · ${brand.name}`, template: `%s · ${brand.name}` },
+    description: fillText(lang, t.description),
     keywords: t.keywords,
     alternates: alternates(lang, "/"),
+    applicationName: brand.name,
     openGraph: {
       type: "website",
       locale: OG_LOCALE[lang],
       siteName: brand.name,
-      title: t.ogTitle,
-      description: t.ogDescription,
+      title: fillText(lang, t.ogTitle),
+      description: fillText(lang, t.ogDescription),
     },
   };
 }

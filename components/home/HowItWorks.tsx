@@ -11,7 +11,7 @@ import { brand } from "@/lib/site";
 
 
 export function HowItWorks() {
-  const { t } = useI18n();
+  const { t, fill } = useI18n();
   return (
     <section id="how" className="relative mx-auto max-w-6xl scroll-mt-24 px-4 pt-24 sm:px-5 sm:pt-32">
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
@@ -31,7 +31,7 @@ export function HowItWorks() {
                   </span>
                   <div>
                     <h3 className="text-lg font-semibold tracking-tight">{s.title}</h3>
-                    <p className="mt-1 leading-relaxed text-muted">{s.text}</p>
+                    <p className="mt-1 leading-relaxed text-muted">{fill(s.text)}</p>
                   </div>
                 </li>
               </Reveal>

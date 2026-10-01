@@ -126,3 +126,15 @@ export const IconCard = (p: P) => (
     <path d="M3 10h18M7 15h3" />
   </svg>
 );
+export const IconLock = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" />
+    <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+  </svg>
+);
+export const IconShield = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 3.5 5 6v5.5c0 4.3 3 7.8 7 9 4-1.2 7-4.7 7-9V6l-7-2.5Z" />
+    <path d="m9 12 2 2 4-4" />
+  </svg>
+);
