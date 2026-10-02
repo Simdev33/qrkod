@@ -57,11 +57,11 @@ const es: Dictionary = {
   },
 
   hero: {
-    eyebrow: "Códigos QR dinámicos · los primeros {days} días por {intro}",
+    eyebrow: "Códigos QR dinámicos",
     line1: "Imprímelo una vez,",
     line2: "redirígelo",
     line2Mark: "cuando quieras.",
-    lead: "Crea un código QR en segundos. <b>Pruébalo {days} días por solo {intro}</b>; después cuesta {monthly} al mes, y puedes cambiar el enlace que hay detrás cuando quieras.",
+    lead: "Crea un código QR en segundos. Y cambia el enlace cuando quieras.",
   },
 
   generator: {

@@ -51,11 +51,11 @@ const hu: Dictionary = {
   },
 
   hero: {
-    eyebrow: "Dinamikus QR-kódok · {days} napig {intro}",
+    eyebrow: "Dinamikus QR-kódok",
     line1: "Nyomtasd ki egyszer,",
     line2: "irányítsd",
     line2Mark: "bármikor.",
-    lead: "Készíts QR-kódot pár másodperc alatt. <b>{days} napig mindössze {intro}</b> – utána havi {monthly}, a mögötte lévő linket pedig bármikor átírhatod.",
+    lead: "Készíts QR-kódot pár másodperc alatt. A linket pedig bármikor átírhatod.",
   },
 
   generator: {

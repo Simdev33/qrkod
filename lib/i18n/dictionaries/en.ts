@@ -58,11 +58,11 @@ const en = {
   },
 
   hero: {
-    eyebrow: "Dynamic QR codes · first {days} days for {intro}",
+    eyebrow: "Dynamic QR codes",
     line1: "Print it once,",
     line2: "redirect it",
     line2Mark: "anytime.",
-    lead: "Create a QR code in seconds. <b>Try it for {days} days for just {intro}</b> – after that it’s {monthly} a month, and you can change the link behind it whenever you like.",
+    lead: "Create a QR code in seconds. And you can change the link whenever you like.",
   },
 
   generator: {
