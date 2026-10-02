@@ -56,7 +56,7 @@ there – don’t remove that address from the project.
 - UI texts: `lib/i18n/dictionaries/` (`en.ts` is the source and defines the `Dictionary` type). Prices are
   placeholders (`{intro}`, `{monthly}`, `{days}`, `{next}`), formatted per language from `PLAN` in `lib/site.ts`.
 - Terms of Service and Privacy Policy: `lib/i18n/legal/` (the English text is the source and prevails). Operator,
-  processors and the effective date are in `lib/legal.ts` – **the contact email is still missing** (the pages show
-  “to be completed” until it is set in `lib/site.ts` → `brand.email`).
+  processors and the effective date are in `lib/legal.ts`; the contact email (help@testmyabilities.com, shared by
+  every TourCierge site) is `brand.email` in `lib/site.ts`.
 - Icons: `app/icon.svg` is the source; `npm run icons` regenerates `favicon.ico`, `apple-icon.png` and the manifest
   icons.

@@ -17,8 +17,8 @@ export const brand = {
   name: "GenerateMyQRCodes",
   domain: "generatemyqrcodes.com",
   url: configuredOrigin() || "http://localhost:3244",
-  /** Contact address – not provided yet (the legal pages show “to be completed” while empty). */
-  email: "",
+  /** Contact address of the operator – the same for every TourCierge site. */
+  email: "help@testmyabilities.com",
 };
 
 /**
