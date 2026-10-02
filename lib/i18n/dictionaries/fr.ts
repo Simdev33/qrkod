@@ -2,7 +2,7 @@ import type { Dictionary } from "./en";
 
 const fr: Dictionary = {
   meta: {
-    title: "Générateur de QR code – {days} jours pour {intro}, puis {monthly}/mois",
+    title: "Générateur de QR codes dynamiques – lien modifiable à tout moment",
     description:
       "Créez un QR code dynamique et personnalisé en quelques secondes. Les {days} premiers jours coûtent {intro}, puis il reste actif pour {monthly} par mois – et vous pouvez modifier le lien qui se cache derrière à tout moment.",
     keywords: ["générateur de QR code", "QR code dynamique", "QR code modifiable", "QR code avec logo", "suivi de QR code"],

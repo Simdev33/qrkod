@@ -9,7 +9,7 @@
 
 const en = {
   meta: {
-    title: "QR code generator – {days} days for {intro}, then {monthly}/month",
+    title: "Dynamic QR code generator – change the link anytime",
     description:
       "Create a custom, dynamic QR code in seconds. The first {days} days cost {intro}, then it stays live for {monthly} a month – and you can change the link behind it at any time.",
     keywords: ["QR code generator", "dynamic QR code", "editable QR code", "QR code with logo", "QR code tracking"],

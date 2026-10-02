@@ -2,7 +2,7 @@ import type { Dictionary } from "./en";
 
 const hu: Dictionary = {
   meta: {
-    title: "QR-kód készítő – {days} napig {intro}, utána havi {monthly}",
+    title: "Dinamikus QR-kód készítő – a link bármikor átírható",
     description:
       "Készíts egyedi, dinamikus QR-kódot pár másodperc alatt. Az első {days} nap díja {intro}, utána havi {monthly} díjjal él tovább – a mögötte lévő linket pedig bármikor átírhatod.",
     keywords: ["QR-kód készítő", "dinamikus QR-kód", "szerkeszthető QR-kód", "QR-kód logóval", "QR-kód statisztika"],
