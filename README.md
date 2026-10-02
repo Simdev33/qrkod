@@ -28,7 +28,8 @@ the real payment form is used (test card 4242 4242 4242 4242).
    `STRIPE_WEBHOOK_SECRET`, `SESSION_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`).
 3. **Vercel → Settings → Functions → Region:** the region closest to the database (Turso `aws-eu-west-1` →
    Vercel `dub1`).
-4. **Stripe → Webhooks:** endpoint `https://generatemyqrcodes.com/api/stripe/webhook` with the events listed in
+4. **Stripe → Webhooks (optional):** without it, renewals and endings are read from Stripe when a code’s paid
+   period has passed. Endpoint `https://generatemyqrcodes.com/api/stripe/webhook` with the events listed in
    `.env.example`; its signing secret goes into `STRIPE_WEBHOOK_SECRET`.
 5. **Stripe → Settings → Payment methods:** register the domain for Apple Pay / Google Pay (the express buttons
    only appear over HTTPS on a registered domain).

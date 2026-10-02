@@ -7,7 +7,7 @@ import { dayKey } from "@/lib/format";
 import { CODE_RE, randomCode, randomToken } from "@/lib/ids";
 import { PENDING_DAYS, RETENTION_MONTHS } from "@/lib/legal";
 import { DAY, FREE_DAYS } from "@/lib/site";
-import { lifeStatus } from "@/lib/status";
+import { isSubscribed, lifeStatus } from "@/lib/status";
 import type { CodeView, SubStatus } from "@/lib/types";
 
 export type CodeRow = {
@@ -37,6 +37,13 @@ export const cleanTitle = (t: unknown) =>
 
 /** A demó-előfizetés „megújulása”: a Stripe havi terhelését utánozza, amikor legközelebb ránézünk. */
 async function refresh(row: CodeRow, now: number): Promise<CodeRow> {
+  // A Stripe subscription whose paid period has passed: it has probably renewed, but without a webhook
+  // nothing told us – so it is read from Stripe again (lib/server/billing.ts → refreshSubscription).
+  if (row.sub_id && !row.sub_id.startsWith("demo_")) {
+    if (!isSubscribed(row.sub_status) || row.paid_until == null || row.paid_until > now) return row;
+    const { refreshSubscription } = await import("./billing");
+    return refreshSubscription(row);
+  }
   if (!row.sub_id?.startsWith("demo_") || row.paid_until == null || row.paid_until > now) return row;
   // Élesben egy (fejlesztésből ottmaradt) demó-előfizetés nem újulhat meg magától.
   if (paymentMode() !== "demo") return row;

@@ -4,7 +4,7 @@ import { ManageView } from "@/components/manage/ManageView";
 import { hasLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/server";
 import { TOKEN_RE } from "@/lib/ids";
-import { completeCheckout, paymentMode } from "@/lib/server/billing";
+import { completeCheckout, missingPaymentEnv, paymentMode, refreshSubscription } from "@/lib/server/billing";
 import { getByToken, toView } from "@/lib/server/codes";
 import { currentOrigin, requestTime } from "@/lib/server/request";
 
@@ -37,7 +37,14 @@ export default async function ManagePage({ params, searchParams }: PageProps<"/[
     flash = paid ? "paid" : "checkout-canceled";
     row = (await getByToken(token)) ?? row;
   }
+  // Back from the Stripe customer portal: a cancellation made there is picked up right away.
+  if (sp.from === "portal") row = await refreshSubscription(row);
   const now = requestTime();
+
+  const missing = missingPaymentEnv();
+  if (missing.length && process.env.NODE_ENV === "production") {
+    console.error(`[billing] payment form is off – missing: ${missing.join(", ")} (set them in Vercel, then redeploy)`);
+  }
 
   return (
     <ManageView
@@ -47,7 +54,7 @@ export default async function ManagePage({ params, searchParams }: PageProps<"/[
       origin={await currentOrigin()}
       mode={paymentMode()}
       flash={flash}
-      stripeKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ""}
+      stripeKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim() ?? ""}
     />
   );
 }

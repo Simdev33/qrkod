@@ -1,6 +1,7 @@
 import "server-only";
 import Stripe from "stripe";
 import { applySubscription, getById, getBySubscription, type CodeRow } from "./codes";
+import { one } from "./db";
 import { paymentMode } from "./mode";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import { fill } from "@/lib/i18n/format";
@@ -19,6 +20,9 @@ import type { SubStatus } from "@/lib/types";
 //
 // Without a Stripe key, in development, a demo activation stands in for the payment; in production the
 // subscription is switched off.
+//
+// The webhook is optional: the payment is written onto the code right after it (complete / the return URL),
+// and renewals are picked up when a code's paid period has passed (refreshSubscription).
 
 export { paymentMode };
 
@@ -58,7 +62,7 @@ async function ensureProduct() {
 }
 
 async function loadPrices() {
-  const fromEnv = { intro: process.env.STRIPE_PRICE_INTRO, monthly: process.env.STRIPE_PRICE_MONTHLY };
+  const fromEnv = { intro: process.env.GMQR_PRICE_INTRO, monthly: process.env.GMQR_PRICE_MONTHLY };
   if (fromEnv.intro && fromEnv.monthly) return { intro: fromEnv.intro, monthly: fromEnv.monthly };
 
   const { data } = await stripe().prices.list({ lookup_keys: Object.values(LOOKUP), active: true, limit: 10 });
@@ -92,7 +96,7 @@ async function loadPrices() {
   return { intro, monthly };
 }
 
-/** The two prices – created in Stripe on first use (or taken from STRIPE_PRICE_INTRO / STRIPE_PRICE_MONTHLY). */
+/** The two prices – created in Stripe on first use (or taken from GMQR_PRICE_INTRO / GMQR_PRICE_MONTHLY). */
 function prices() {
   pricesPromise ??= loadPrices().catch((error) => {
     pricesPromise = null;
@@ -135,6 +139,15 @@ const periodEnd = (s: Stripe.Subscription) => {
   return end ? end * 1000 : null;
 };
 
+/** The fields of a subscription that are kept on its code. */
+const stateOf = (sub: Stripe.Subscription) => ({
+  id: sub.id,
+  status: sub.status as SubStatus,
+  periodEnd: periodEnd(sub),
+  cancelAtPeriodEnd: sub.cancel_at_period_end || !!sub.cancel_at,
+  customer: typeof sub.customer === "string" ? sub.customer : sub.customer?.id,
+});
+
 /** Writes a subscription’s state onto its code. A late event of an older, ended subscription never overwrites a newer one. */
 async function sync(sub: Stripe.Subscription, codeId?: string | null) {
   if (!ours(sub)) return;
@@ -142,13 +155,34 @@ async function sync(sub: Stripe.Subscription, codeId?: string | null) {
   const row = id ? await getById(id) : null;
   if (!row) return;
   if (row.sub_id && row.sub_id !== sub.id && !isSubscribed(sub.status as SubStatus)) return;
-  await applySubscription(row.id, {
-    id: sub.id,
-    status: sub.status as SubStatus,
-    periodEnd: periodEnd(sub),
-    cancelAtPeriodEnd: sub.cancel_at_period_end || !!sub.cancel_at,
-    customer: typeof sub.customer === "string" ? sub.customer : sub.customer?.id,
-  });
+  await applySubscription(row.id, stateOf(sub));
+}
+
+const g = globalThis as unknown as { __qrRefreshed?: Map<string, number> };
+const refreshed: Map<string, number> = (g.__qrRefreshed ??= new Map());
+
+/**
+ * Reads a code's subscription from Stripe again – when its paid period has passed (a renewal, a failed payment or
+ * an ending), or after the customer portal. At most once a minute per code, so a scanned code doesn't hammer Stripe.
+ */
+export async function refreshSubscription(row: CodeRow, now = Date.now()): Promise<CodeRow> {
+  if (paymentMode() !== "stripe" || !row.sub_id || row.sub_id.startsWith("demo_")) return row;
+  if (now - (refreshed.get(row.id) ?? 0) < 60_000) return row;
+  refreshed.set(row.id, now);
+  try {
+    const sub = await stripe().subscriptions.retrieve(row.sub_id);
+    if (!ours(sub)) return row;
+    await applySubscription(row.id, stateOf(sub));
+    return (await one<CodeRow>("SELECT * FROM codes WHERE id = ?", [row.id])) ?? row;
+  } catch (error) {
+    console.error("[billing] refresh", row.id, error);
+    return row;
+  }
+}
+
+/** The payment settings that are missing – logged in production, so a missing key is easy to spot. */
+export function missingPaymentEnv() {
+  return ["STRIPE_SECRET_KEY", "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"].filter((name) => !process.env[name]?.trim());
 }
 
 /**
@@ -258,7 +292,8 @@ export async function portalUrl(row: CodeRow, origin: string, lang: Locale) {
   if (paymentMode() !== "stripe" || !row.customer_id || row.customer_id.startsWith("demo_")) throw new Error("no_customer");
   const session = await stripe().billingPortal.sessions.create({
     customer: row.customer_id,
-    return_url: `${origin}${localePath(lang, `/manage/${row.token}`)}`,
+    // The manage page reads the subscription again on the way back (a cancellation there has no webhook).
+    return_url: `${origin}${localePath(lang, `/manage/${row.token}`)}?from=portal`,
     configuration: await portalConfiguration(origin),
     locale: lang as Stripe.BillingPortal.SessionCreateParams.Locale,
   });
