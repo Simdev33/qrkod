@@ -38,7 +38,7 @@ export const legalHu: LegalTexts = {
         h: "A szerződés létrejötte és a kezelőlink",
         p: [
           "A szerződés elektronikus úton jön létre a QR-kód létrehozásával, a fizetős szolgáltatás esetében pedig az előfizetés megrendelésével. Az Üzemeltető a szerződést nem iktatja, és az magatartási kódexre nem utal.",
-          "Jelszavas regisztráció nincs. Minden kódhoz egy egyedi, titkos kezelőlink tartozik: aki ismeri, kezelheti a kódot (módosíthatja, előfizethet rá, lemondhatja az előfizetést, törölheti a kódot). A kezelőlink biztonságos megőrzése és titokban tartása a te felelősséged. Ha elveszíted, az Üzemeltető csak akkor tud segíteni, ha hitelt érdemlően igazolni tudod, hogy a kód a tiéd, például az előfizetéshez használt e-mail-címmel.",
+          "Jelszavas regisztráció nincs. Minden kódhoz egy egyedi, titkos kezelőlink tartozik: aki ismeri, kezelheti a kódot (módosíthatja, előfizethet rá, lemondhatja az előfizetést, törölheti a kódot). A kezelőlink biztonságos megőrzése és titokban tartása a te felelősséged. Az előfizetők a „Kódjaim” oldalon az előfizetéshez használt e-mail-címre küldött, egyszer használatos kóddal is beléphetnek; ilyenkor bármelyik eszközön látják az ezzel a címmel kifizetett összes kódot. Az e-mail-fiókod biztonságáért te felelsz. Ha elveszíted a kezelőlinket, és belépni sem tudsz, az Üzemeltető csak akkor tud segíteni, ha hitelt érdemlően igazolni tudod, hogy a kód a tiéd.",
         ],
       },
       {
@@ -160,7 +160,7 @@ export const legalHu: LegalTexts = {
       {
         h: "Röviden",
         list: [
-          "Nincs regisztráció és jelszó; minden kódot a saját titkos kezelőlinkjével kezelhetsz.",
+          "Nincs regisztráció és jelszó; minden kódot a saját titkos kezelőlinkjével kezelhetsz, az előfizetők pedig e-mailben kapott, egyszer használatos kóddal is beléphetnek.",
           "A kódjaidat beolvasó személyekről nem tárolunk személyes adatot – csak a beolvasások napi számát.",
           "A fizetéseket a Stripe dolgozza fel; a kártyaadataidat nem látjuk és nem tároljuk.",
           "Nem használunk analitikai, hirdetési vagy követő sütiket.",
@@ -197,6 +197,15 @@ export const legalHu: LegalTexts = {
         ],
       },
       {
+        h: "Belépés e-mailben kapott kóddal",
+        p: [
+          "Ha előfizettél, a „Kódjaim” oldalon e-mailben kapott, egyszer használatos kóddal beléphetsz, és bármelyik eszközön láthatod az e-mail-címeddel kifizetett kódokat.",
+          "<b>Kezelt adatok:</b> a megadott e-mail-cím, a belépőkód (kizárólag kulcsolt hash formájában), a lejárati ideje és a sikertelen próbálkozások száma; belépés után egy aláírt munkamenet-süti, amely az e-mail-címedet tartalmazza. A kódjaid megtalálásához megkeressük a Stripe-ban az ehhez az e-mail-címhez tartozó ügyfeleket.",
+          "<b>Cél:</b> hogy az előfizetők hozzáférjenek a kódjaikhoz. <b>Jogalap:</b> szerződés teljesítése (GDPR 6. cikk (1) bekezdés b) pont). <b>Megőrzés:</b> a belépőkód {loginMinutes} percig (felhasználáskor azonnal töröljük); a munkamenet-süti {sessionDays} napig, vagy amíg ki nem lépsz.",
+          "Kódot csak akkor küldünk, ha a cím egy előfizetőhöz tartozik; az oldal mindkét esetben ugyanazt az üzenetet mutatja. A belépő e-maileket adatfeldolgozóként a következő szolgáltató küldi: {emailSender}.",
+        ],
+      },
+      {
         h: "Kapcsolatfelvétel",
         p: [
           "Ha írsz nekünk, a nevedet, az e-mail-címedet és az üzeneted tartalmát a válaszadáshoz használjuk. <b>Jogalap:</b> a megkeresések kezeléséhez fűződő jogos érdekünk (GDPR 6. cikk (1) bekezdés f) pont). <b>Megőrzés:</b> az ügy lezárását követő 1 évig.",
@@ -206,12 +215,15 @@ export const legalHu: LegalTexts = {
         h: "Technikai naplók",
         p: [
           "Az oldal kiszolgálásakor – mint bármely weboldal esetében – a tárhelyszolgáltató szerverei technikai adatokat rögzítenek: IP-cím, a kérés időpontja, a lekért cím és a böngésző típusa. Ez egy QR-kód beolvasásakor is így történik. <b>Cél:</b> a Szolgáltatás biztonságos és zavartalan működése, valamint a hibák és visszaélések felderítése. <b>Jogalap:</b> jogos érdekünk (GDPR 6. cikk (1) bekezdés f) pont). <b>Megőrzés:</b> rövid ideig, a tárhelyszolgáltató adatmegőrzési szabályai szerint.",
+          "A belépési és fizetési kéréseknél az IP-címet a szerver memóriájában is megőrizzük legfeljebb 15 percig, hogy a túlzott használatot korlátozni tudjuk.",
         ],
       },
       {
         h: "Sütik és helyi tárolás",
         list: [
           "NEXT_LOCALE süti: megjegyzi a nyelvválasztóban kiválasztott nyelvet (1 évig).",
+          "{sessionCookie} süti: e-mail-kóddal történő belépés után bejelentkezve tart a „Kódjaim” oldalon; aláírt, és szkriptek nem olvashatják ({sessionDays} napig, vagy amíg ki nem lépsz).",
+          "{loginCookie} süti: a folyamatban lévő belépés a kód kérése és megadása között ({loginMinutes} percig).",
           "Helyi tárolás (localStorage): az ezen az eszközön létrehozott vagy megnyitott kódok kezelőlinkjei, hogy megtaláld őket a „Kódjaim” oldalon. A „Kódjaim” oldal ezekkel kérdezi le a kódjaid állapotát; egyébként a böngésződben maradnak, és a böngésző beállításaiban bármikor törölheted őket.",
           "A fizetési űrlapot a Stripe biztosítja, amely saját sütiket használ a fizetés biztonságos lebonyolításához és a csalások megelőzéséhez.",
         ],
@@ -223,6 +235,7 @@ export const legalHu: LegalTexts = {
           "Tárhely és alkalmazásszerver: {hosting}",
           "Adatbázis: {database} – a kódok adatait az Európai Unióban (Írországban) lévő szerveren tárolja.",
           "Fizetés: {payments} – önálló adatkezelőként.",
+          "Belépő e-mailek küldése: {emailSender}",
         ],
         after: [
           "E szolgáltatók némelyikének székhelye az Amerikai Egyesült Államokban van, így adatok az Európai Gazdasági Térségen kívülre is kerülhetnek. Az ilyen adattovábbítás megfelelő garanciák mellett történik (az EU–USA adatvédelmi keretrendszer és/vagy az Európai Bizottság által elfogadott általános szerződési feltételek alapján).",
@@ -232,7 +245,7 @@ export const legalHu: LegalTexts = {
       {
         h: "Adatbiztonság",
         p: [
-          "Minden kapcsolat titkosított (HTTPS). A kezelő-token 192 bites véletlen érték, az IP-címeket csak sózott hash-ként tároljuk, és az adatbázishoz csak az Üzemeltető fér hozzá.",
+          "Minden kapcsolat titkosított (HTTPS). A kezelő-token 192 bites véletlen érték, az IP-címeket csak sózott hash-ként, a belépőkódokat csak kulcsolt hash-ként tároljuk (ezek {loginMinutes} perc után lejárnak, és {loginAttempts} hibás próbálkozás után érvényüket vesztik). A belépési sütik aláírtak, szkriptek nem olvashatják őket, és az adatbázishoz csak az Üzemeltető fér hozzá.",
         ],
       },
       {

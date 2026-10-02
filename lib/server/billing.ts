@@ -119,6 +119,13 @@ async function ensureCustomer(email: string, lang: Locale) {
   return created.id;
 }
 
+/** All of our customers with this email address – the sign-in finds the codes through them. */
+export async function ourCustomerIds(email: string) {
+  if (paymentMode() !== "stripe") return [];
+  const { data } = await stripe().customers.list({ email: normalizeEmail(email), limit: 100 });
+  return data.filter((customer) => !customer.deleted && ours(customer)).map((customer) => customer.id);
+}
+
 /* ------------------------------ subscriptions ----------------------------- */
 
 /** Since the 2025 API versions the period end is on the subscription items. */

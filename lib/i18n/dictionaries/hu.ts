@@ -372,7 +372,7 @@ const hu: Dictionary = {
       ],
       email: "E-mail-cím",
       emailPlaceholder: "te@pelda.hu",
-      emailHint: "A Stripe erre a címre küldi a bizonylatokat.",
+      emailHint: "A Stripe erre a címre küldi a bizonylatokat – és ezzel bármelyik eszközön beléphetsz a kódjaidhoz.",
       continue: "Tovább a fizetéshez",
       change: "Módosítás",
       consent:
@@ -460,6 +460,24 @@ const hu: Dictionary = {
     notManageLink: "Ez nem kezelőlink. Így néz ki: …/manage/Xk2…",
   },
 
+  account: {
+    title: "A kódjaid bármelyik eszközön",
+    text: "Fizettél már kódért? Lépj be azzal az e-mail-címmel, amelyet a fizetésnél megadtál – küldünk rá egy 6 jegyű kódot.",
+    email: "E-mail-cím",
+    send: "Kód küldése",
+    sent: "Ha ez a cím egy előfizetőhöz tartozik, küldtünk egy 6 jegyű kódot ide: <b>{email}</b>. {minutes} percig érvényes.",
+    code: "Belépőkód",
+    verify: "Belépés",
+    resend: "Új kód küldése",
+    resent: "Küldtünk egy új kódot.",
+    otherEmail: "Másik e-mail-cím",
+    signedIn: "Belépve: <b>{email}</b>",
+    signedInText: "Az ezzel a címmel kifizetett kódok bármelyik eszközön itt jelennek meg.",
+    signOut: "Kilépés",
+    emptyPrompt: "Fizettél már kódért?",
+    emptyLink: "Belépés e-maillel",
+  },
+
   paused: {
     title: "Ez a QR-kód most szünetel.",
     text: "A tulajdonosa nem hosszabbította meg, ezért most nem tudunk továbbküldeni. Próbáld újra később, vagy keresd a tulajdonost más módon.",
@@ -499,6 +517,19 @@ const hu: Dictionary = {
     logo_read: "Ezt a képet nem sikerült beolvasni.",
     logo_complex: "A kép túl részletes – próbálj egy egyszerűbb logót.",
     export_failed: "A letöltés nem sikerült. Próbáld újra.",
+    invalid_code: "Ez a kód nem jó. Ellenőrizd, és próbáld újra.",
+    code_expired: "A kód lejárt. Kérj újat.",
+    code_locked: "Túl sok hibás próbálkozás. Kérj új kódot.",
+    email_failed: "Nem sikerült elküldeni az e-mailt. Próbáld újra később.",
+    login_unavailable: "A belépés most nem érhető el.",
+    not_signed_in: "Lejárt a belépésed. Lépj be újra.",
+  },
+
+  email: {
+    subject: "{code} – a {brand} belépőkódod",
+    intro: "Ezzel a kóddal léphetsz be a {brand} oldalra:",
+    validity: "{minutes} percig érvényes. A „Kódjaim” oldalon add meg.",
+    ignore: "Ha nem te kérted, nyugodtan hagyd figyelmen kívül ezt a levelet – a kód nélkül senki nem tud belépni.",
   },
 
   billing: {

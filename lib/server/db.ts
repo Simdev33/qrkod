@@ -32,6 +32,13 @@ const TABLES = [
     count    INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (code_id, day)
   )`,
+  // Sign-in codes sent by email (lib/server/login.ts) – only a keyed hash of the code is stored.
+  `CREATE TABLE IF NOT EXISTS login_codes (
+    email       TEXT PRIMARY KEY,
+    code_hash   TEXT NOT NULL,
+    expires_at  INTEGER NOT NULL,
+    attempts    INTEGER NOT NULL DEFAULT 0
+  )`,
 ];
 
 /** Később hozzáadott oszlopok: a régebbi adatbázisokba ALTER TABLE-lel kerülnek be. */
@@ -40,6 +47,7 @@ const ADDED_COLUMNS: [table: string, column: string, type: string][] = [["codes"
 const INDEXES = [
   "CREATE INDEX IF NOT EXISTS codes_sub ON codes(sub_id)",
   "CREATE INDEX IF NOT EXISTS codes_creator ON codes(creator, created_at)",
+  "CREATE INDEX IF NOT EXISTS codes_customer ON codes(customer_id)",
 ];
 
 function connect(): Client {

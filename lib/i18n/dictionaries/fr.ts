@@ -379,7 +379,7 @@ const fr: Dictionary = {
       ],
       email: "Adresse e-mail",
       emailPlaceholder: "vous@exemple.fr",
-      emailHint: "Stripe envoie vos reçus à cette adresse.",
+      emailHint: "Stripe envoie vos reçus à cette adresse – et elle vous permet de vous connecter pour retrouver vos codes sur tous vos appareils.",
       continue: "Continuer vers le paiement",
       change: "Modifier",
       consent:
@@ -468,6 +468,24 @@ const fr: Dictionary = {
     notManageLink: "Ce n’est pas un lien de gestion. Il ressemble à ceci : …/manage/Xk2…",
   },
 
+  account: {
+    title: "Vos codes sur tous vos appareils",
+    text: "Vous avez déjà payé pour un code ? Connectez-vous avec l’adresse e-mail utilisée lors du paiement – nous vous enverrons un code à 6 chiffres.",
+    email: "Adresse e-mail",
+    send: "Recevoir un code",
+    sent: "Si <b>{email}</b> appartient à un abonné, nous y avons envoyé un code à 6 chiffres. Il est valable {minutes} minutes.",
+    code: "Code de connexion",
+    verify: "Se connecter",
+    resend: "Envoyer un nouveau code",
+    resent: "Nous vous avons envoyé un nouveau code.",
+    otherEmail: "Utiliser une autre adresse",
+    signedIn: "Connecté avec <b>{email}</b>",
+    signedInText: "Les codes payés avec cette adresse s’affichent ici, sur tous vos appareils.",
+    signOut: "Se déconnecter",
+    emptyPrompt: "Vous avez déjà payé pour un code ?",
+    emptyLink: "Se connecter par e-mail",
+  },
+
   paused: {
     title: "Ce QR code est en pause.",
     text: "Son propriétaire ne l’a pas renouvelé, nous ne pouvons donc pas vous rediriger pour le moment. Réessayez plus tard, ou contactez le propriétaire par un autre moyen.",
@@ -507,6 +525,19 @@ const fr: Dictionary = {
     logo_read: "Impossible de lire cette image.",
     logo_complex: "L’image est trop détaillée – essayez un logo plus simple.",
     export_failed: "Le téléchargement a échoué. Veuillez réessayer.",
+    invalid_code: "Ce code n’est pas correct. Vérifiez-le et réessayez.",
+    code_expired: "Ce code a expiré. Veuillez en demander un nouveau.",
+    code_locked: "Trop de tentatives incorrectes. Veuillez demander un nouveau code.",
+    email_failed: "Nous n’avons pas pu envoyer l’e-mail. Veuillez réessayer plus tard.",
+    login_unavailable: "La connexion n’est pas disponible pour le moment.",
+    not_signed_in: "Votre session a expiré. Veuillez vous reconnecter.",
+  },
+
+  email: {
+    subject: "{code} est votre code de connexion {brand}",
+    intro: "Voici votre code pour vous connecter à {brand} :",
+    validity: "Il est valable {minutes} minutes. Saisissez-le sur la page « Mes codes ».",
+    ignore: "Si vous ne l’avez pas demandé, vous pouvez ignorer cet e-mail – personne ne peut se connecter sans ce code.",
   },
 
   billing: {

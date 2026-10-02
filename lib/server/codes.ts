@@ -220,4 +220,15 @@ export async function purgeExpired(now = Date.now()) {
   const args = [now - PENDING_DAYS * DAY, now - RETENTION_MONTHS * 30 * DAY];
   await run(`DELETE FROM scan_days WHERE code_id IN (${stale})`, args);
   await run(`DELETE FROM codes WHERE id IN (${stale})`, args);
+  await run("DELETE FROM login_codes WHERE expires_at < ?", [now]);
+}
+
+/** The codes of these Stripe customers (the codes paid for with one email address), newest first. */
+export async function getByCustomers(customerIds: string[], now = Date.now()): Promise<CodeRow[]> {
+  if (!customerIds.length) return [];
+  const rows = await all<CodeRow>(
+    `SELECT * FROM codes WHERE customer_id IN (${customerIds.map(() => "?").join(", ")}) ORDER BY created_at DESC LIMIT 200`,
+    customerIds,
+  );
+  return Promise.all(rows.map((row) => refresh(row, now)));
 }

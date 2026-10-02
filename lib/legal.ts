@@ -2,6 +2,7 @@
 // Values in square brackets are placeholders: while any remains, the documents show a notice and the
 // missing value is highlighted.
 
+import { SIGNIN } from "./signin";
 import { brand } from "./site";
 
 /** The operator – same company as GetProCV, DoneSignIn and ConvertPDFNow. */
@@ -20,12 +21,13 @@ export const parties = {
   database: "ChiselStrike, Inc. – Turso (https://turso.tech)",
   payments: "Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, D02 H210, Ireland",
   paymentsPrivacy: "https://stripe.com/privacy",
+  emailSender: "Resend, Inc., USA (https://resend.com)",
   authority: "Úrad na ochranu osobných údajov Slovenskej republiky, Hraničná 12, 820 07 Bratislava 27 (https://dataprotection.gov.sk)",
   adr: "Slovenská obchodná inšpekcia (https://www.soi.sk)",
 };
 
 /** Date from which the current documents apply (YYYY-MM-DD). Update it whenever their content changes. */
-export const LEGAL_EFFECTIVE_DATE = "2026-10-01";
+export const LEGAL_EFFECTIVE_DATE = "2026-10-02";
 
 /** Paused codes are kept this long, then deleted (lib/server/codes.ts → purgeExpired). */
 export const RETENTION_MONTHS = 12;
@@ -54,6 +56,11 @@ export function legalVars(siteUrl: string, prices: Record<string, string | numbe
     retentionMonths: RETENTION_MONTHS,
     pendingDays: PENDING_DAYS,
     hourlyLimit: HOURLY_CREATE_LIMIT,
+    loginMinutes: SIGNIN.codeMinutes,
+    loginAttempts: SIGNIN.maxAttempts,
+    sessionDays: SIGNIN.sessionDays,
+    sessionCookie: SIGNIN.cookies.session,
+    loginCookie: SIGNIN.cookies.login,
   };
 }
 

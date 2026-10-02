@@ -3,7 +3,8 @@
 //
 // Placeholders: {brand} {siteUrl} {operatorName} {operatorAddress} {operatorRegistry} {operatorTax}
 // {operatorEmail} {hosting} {database} {payments} {paymentsPrivacy} {authority} {adr} {intro} {monthly}
-// {days} {next} {retentionMonths} {pendingDays} {hourlyLimit} {date}
+// {days} {next} {retentionMonths} {pendingDays} {hourlyLimit} {date} {emailSender} {loginMinutes}
+// {loginAttempts} {sessionDays} {sessionCookie} {loginCookie}
 
 export type LegalSection = {
   /** Section title (without number – the page adds it). */

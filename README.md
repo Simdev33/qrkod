@@ -25,13 +25,23 @@ the real payment form is used (test card 4242 4242 4242 4242).
 1. **Turso:** a database (ideally in an EU region) and a token.
 2. **Vercel → Settings → Environment Variables:** see [.env.example](.env.example) (`TURSO_DATABASE_URL`,
    `TURSO_AUTH_TOKEN`, `CREATOR_SALT`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`,
-   `STRIPE_WEBHOOK_SECRET`).
+   `STRIPE_WEBHOOK_SECRET`, `SESSION_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`).
 3. **Vercel → Settings → Functions → Region:** the region closest to the database (Turso `aws-eu-west-1` →
    Vercel `dub1`).
 4. **Stripe → Webhooks:** endpoint `https://generatemyqrcodes.com/api/stripe/webhook` with the events listed in
    `.env.example`; its signing secret goes into `STRIPE_WEBHOOK_SECRET`.
 5. **Stripe → Settings → Payment methods:** register the domain for Apple Pay / Google Pay (the express buttons
    only appear over HTTPS on a registered domain).
+6. **Resend:** verify the domain (generatemyqrcodes.com) for the sender address in `EMAIL_FROM`.
+
+## Signing in
+
+There are no accounts: every code is managed through its private link, and the browser remembers the codes
+created or opened on it. Subscribers can also sign in on the “My codes” page with a 6-digit code sent by email
+(Resend); they then see every code paid for with that address, on any device. The codes are found through the
+Stripe customers with that email address (`metadata.app = "generatemyqrcodes"`), so no user table is needed –
+only `login_codes` (hashed codes, 10 minutes, 5 attempts) and a signed, httpOnly session cookie (180 days).
+Without `RESEND_API_KEY`, in development the code is printed to the server log.
 
 The QR codes contain the project’s production domain (`VERCEL_PROJECT_PRODUCTION_URL`, set by Vercel): the custom
 domain if there is one, otherwise the `*.vercel.app` address. Codes created on the `vercel.app` address keep working

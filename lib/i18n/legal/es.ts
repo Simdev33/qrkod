@@ -39,7 +39,7 @@ export const legalEs: LegalTexts = {
         h: "Celebración del contrato y enlace de gestión",
         p: [
           "El contrato se celebra por vía electrónica al crear un código QR y, en el caso del servicio de pago, al contratar una suscripción. El Operador no lo archiva y no remite a ningún código de conducta.",
-          "No existe registro con contraseña. Cada código tiene un enlace de gestión único y privado: cualquier persona que lo conozca puede gestionar el código (modificarlo, suscribirse, cancelar la suscripción o eliminar el código). Usted es responsable de conservar el enlace de gestión de forma segura y confidencial. Si lo pierde, el Operador solo podrá ayudarle si usted puede acreditar de forma verosímil que el código le pertenece, por ejemplo, mediante la dirección de correo electrónico utilizada para la suscripción.",
+          "No existe registro con contraseña. Cada código tiene un enlace de gestión único y privado: cualquier persona que lo conozca puede gestionar el código (modificarlo, suscribirse, cancelar la suscripción o eliminar el código). Usted es responsable de conservar el enlace de gestión de forma segura y confidencial. Los suscriptores también pueden iniciar sesión en la página «Mis códigos» con un código de un solo uso enviado a la dirección de correo electrónico utilizada para la suscripción; en ese caso ven, en cualquier dispositivo, todos los códigos pagados con esa dirección. Usted es responsable de la seguridad de su cuenta de correo electrónico. Si pierde el enlace de gestión y no puede iniciar sesión, el Operador solo podrá ayudarle si usted puede acreditar de forma verosímil que el código le pertenece.",
         ],
       },
       {
@@ -161,7 +161,7 @@ export const legalEs: LegalTexts = {
       {
         h: "En resumen",
         list: [
-          "No hay registro ni contraseña; cada código se gestiona con su enlace de gestión privado.",
+          "No hay registro ni contraseña; cada código se gestiona con su enlace de gestión privado, y los suscriptores también pueden iniciar sesión con un código de un solo uso enviado por correo electrónico.",
           "No almacenamos ningún dato personal de las personas que escanean sus códigos, solo el número diario de escaneos.",
           "Los pagos son procesados por Stripe; no vemos ni almacenamos los datos de su tarjeta.",
           "No utilizamos cookies analíticas, publicitarias ni de seguimiento.",
@@ -198,6 +198,15 @@ export const legalEs: LegalTexts = {
         ],
       },
       {
+        h: "Inicio de sesión con un código enviado por correo electrónico",
+        p: [
+          "Si tiene una suscripción, puede iniciar sesión en la página «Mis códigos» con un código de un solo uso que le enviamos por correo electrónico y ver, en cualquier dispositivo, los códigos pagados con su dirección de correo electrónico.",
+          "<b>Datos tratados:</b> la dirección de correo electrónico que introduzca, el código de acceso (almacenado únicamente como hash con clave), su hora de caducidad y el número de intentos fallidos; tras iniciar sesión, una cookie de sesión firmada que contiene su dirección de correo electrónico. Para encontrar sus códigos, buscamos en Stripe los clientes con esa dirección de correo electrónico.",
+          "<b>Finalidad:</b> permitir a los suscriptores acceder a sus códigos. <b>Base jurídica:</b> ejecución de un contrato (artículo 6, apartado 1, letra b), del RGPD). <b>Conservación:</b> el código de acceso, durante {loginMinutes} minutos (se elimina en cuanto se utiliza); la cookie de sesión, durante {sessionDays} días o hasta que cierre la sesión.",
+          "Solo enviamos un código si la dirección pertenece a un suscriptor; la página muestra el mismo mensaje en ambos casos. Los correos de inicio de sesión los envía {emailSender} como encargado del tratamiento.",
+        ],
+      },
+      {
         h: "Contacto con nosotros",
         p: [
           "Si nos escribe, utilizamos su nombre, su dirección de correo electrónico y el contenido de su mensaje para responderle. <b>Base jurídica:</b> nuestro interés legítimo en la gestión de las consultas (artículo 6, apartado 1, letra f), del RGPD). <b>Conservación:</b> durante 1 año desde el cierre del asunto.",
@@ -207,12 +216,15 @@ export const legalEs: LegalTexts = {
         h: "Registros técnicos",
         p: [
           "Al servir el sitio, como ocurre con cualquier sitio web, los servidores del proveedor de alojamiento registran datos técnicos: dirección IP, hora de la solicitud, dirección solicitada y tipo de navegador. Esto también ocurre cuando se escanea un código QR. <b>Finalidad:</b> el funcionamiento seguro e ininterrumpido del Servicio y la detección de errores y abusos. <b>Base jurídica:</b> nuestro interés legítimo (artículo 6, apartado 1, letra f), del RGPD). <b>Conservación:</b> durante un breve periodo, conforme a las normas de conservación de datos del proveedor de alojamiento.",
+          "En las solicitudes de inicio de sesión y de pago, la dirección IP también se conserva en la memoria del servidor durante un máximo de 15 minutos para poder limitar un uso excesivo.",
         ],
       },
       {
         h: "Cookies y almacenamiento local",
         list: [
           "Cookie NEXT_LOCALE: recuerda el idioma que haya elegido en el selector de idioma (1 año).",
+          "Cookie {sessionCookie}: mantiene su sesión iniciada en la página «Mis códigos» después de iniciar sesión con un código enviado por correo electrónico; está firmada y los scripts no pueden leerla ({sessionDays} días o hasta que cierre la sesión).",
+          "Cookie {loginCookie}: el inicio de sesión en curso, entre la solicitud y la introducción del código ({loginMinutes} minutos).",
           "Almacenamiento local (localStorage): los enlaces de gestión de los códigos creados o abiertos en este dispositivo, para que pueda encontrarlos en la página «Mis códigos». La página «Mis códigos» los utiliza para consultar el estado de sus códigos; por lo demás, permanecen en su navegador y puede eliminarlos en cualquier momento desde la configuración del navegador.",
           "El formulario de pago lo proporciona Stripe, que utiliza sus propias cookies para procesar el pago de forma segura y prevenir el fraude.",
         ],
@@ -224,6 +236,7 @@ export const legalEs: LegalTexts = {
           "Alojamiento y servidor de aplicaciones: {hosting}",
           "Base de datos: {database} – los datos de los códigos se almacenan en un servidor situado en la Unión Europea (Irlanda).",
           "Pagos: {payments} – en calidad de responsable independiente del tratamiento.",
+          "Envío de los correos de inicio de sesión: {emailSender}",
         ],
         after: [
           "Algunos de estos proveedores tienen su sede en los Estados Unidos de América, por lo que los datos también pueden transferirse fuera del Espacio Económico Europeo. Dichas transferencias se realizan con las garantías adecuadas (el Marco de Privacidad de Datos UE-EE. UU. y/o las cláusulas contractuales tipo adoptadas por la Comisión Europea).",
@@ -233,7 +246,7 @@ export const legalEs: LegalTexts = {
       {
         h: "Seguridad de los datos",
         p: [
-          "Todas las conexiones están cifradas (HTTPS). El token de gestión es un valor aleatorio de 192 bits, las direcciones IP solo se almacenan como hash con sal y únicamente el Operador tiene acceso a la base de datos.",
+          "Todas las conexiones están cifradas (HTTPS). El token de gestión es un valor aleatorio de 192 bits, las direcciones IP solo se almacenan como hash con sal y los códigos de acceso solo como hash con clave (caducan a los {loginMinutes} minutos y dejan de ser válidos tras {loginAttempts} intentos fallidos). Las cookies de inicio de sesión están firmadas y los scripts no pueden leerlas, y únicamente el Operador tiene acceso a la base de datos.",
         ],
       },
       {

@@ -39,7 +39,7 @@ export const legalFr: LegalTexts = {
         h: "Conclusion du contrat et lien de gestion",
         p: [
           "Le contrat est conclu par voie électronique lors de la création d’un QR code et, pour le service payant, lors de la souscription d’un abonnement. Il n’est pas archivé par l’Exploitant et ne se réfère à aucun code de conduite.",
-          "Aucune inscription avec mot de passe n’est requise. Chaque code dispose d’un lien de gestion unique et privé : toute personne qui le connaît peut gérer le code (le modifier, souscrire un abonnement, résilier l’abonnement, supprimer le code). Il vous appartient de conserver le lien de gestion en lieu sûr et de le garder confidentiel. En cas de perte, l’Exploitant ne peut vous aider que si vous êtes en mesure de prouver de manière crédible que le code vous appartient, par exemple au moyen de l’adresse e-mail utilisée pour l’abonnement.",
+          "Aucune inscription avec mot de passe n’est requise. Chaque code dispose d’un lien de gestion unique et privé : toute personne qui le connaît peut gérer le code (le modifier, souscrire un abonnement, résilier l’abonnement, supprimer le code). Il vous appartient de conserver le lien de gestion en lieu sûr et de le garder confidentiel. Les abonnés peuvent également se connecter sur la page « Mes codes » au moyen d’un code à usage unique envoyé à l’adresse e-mail utilisée pour l’abonnement ; ils voient alors, sur tout appareil, l’ensemble des codes payés avec cette adresse. La sécurité de votre compte de messagerie relève de votre responsabilité. Si vous perdez le lien de gestion et ne pouvez pas vous connecter, l’Exploitant ne peut vous aider que si vous êtes en mesure de prouver de manière crédible que le code vous appartient.",
         ],
       },
       {
@@ -161,7 +161,7 @@ export const legalFr: LegalTexts = {
       {
         h: "En bref",
         list: [
-          "Pas d’inscription ni de mot de passe : chaque code est géré au moyen de son lien de gestion privé.",
+          "Pas d’inscription ni de mot de passe : chaque code est géré au moyen de son lien de gestion privé, et les abonnés peuvent aussi se connecter avec un code à usage unique envoyé par e-mail.",
           "Nous ne stockons aucune donnée personnelle sur les personnes qui scannent vos codes – uniquement le nombre de scans par jour.",
           "Les paiements sont traités par Stripe ; nous ne voyons ni ne conservons vos données de carte.",
           "Nous n’utilisons aucun cookie analytique, publicitaire ou de suivi.",
@@ -198,6 +198,15 @@ export const legalFr: LegalTexts = {
         ],
       },
       {
+        h: "Connexion par code envoyé par e-mail",
+        p: [
+          "Si vous avez souscrit un abonnement, vous pouvez vous connecter sur la page « Mes codes » avec un code à usage unique envoyé par e-mail, et consulter sur tout appareil les codes payés avec votre adresse e-mail.",
+          "<b>Données traitées :</b> l’adresse e-mail que vous saisissez, le code de connexion (stocké uniquement sous forme d’empreinte à clé), sa date d’expiration et le nombre de tentatives infructueuses ; après la connexion, un cookie de session signé contenant votre adresse e-mail. Pour retrouver vos codes, nous recherchons chez Stripe les clients associés à cette adresse e-mail.",
+          "<b>Finalité :</b> permettre aux abonnés d’accéder à leurs codes. <b>Base légale :</b> l’exécution d’un contrat (article 6, paragraphe 1, point b), du RGPD). <b>Durée de conservation :</b> le code de connexion, {loginMinutes} minutes (il est supprimé dès son utilisation) ; le cookie de session, {sessionDays} jours ou jusqu’à votre déconnexion.",
+          "Nous n’envoyons un code que si l’adresse appartient à un abonné ; la page affiche le même message dans les deux cas. Les e-mails de connexion sont envoyés par {emailSender}, en qualité de sous-traitant.",
+        ],
+      },
+      {
         h: "Prise de contact",
         p: [
           "Si vous nous écrivez, nous utilisons votre nom, votre adresse e-mail et le contenu de votre message pour vous répondre. <b>Base légale :</b> notre intérêt légitime à traiter les demandes (article 6, paragraphe 1, point f), du RGPD). <b>Durée de conservation :</b> 1 an après la clôture de la demande.",
@@ -207,12 +216,15 @@ export const legalFr: LegalTexts = {
         h: "Journaux techniques",
         p: [
           "Lors de la fourniture du site – comme pour tout site web –, les serveurs de l’hébergeur enregistrent des données techniques : adresse IP, date et heure de la requête, adresse demandée et type de navigateur. Cela se produit également lors du scan d’un QR code. <b>Finalité :</b> le fonctionnement sûr et ininterrompu du Service ainsi que la détection des erreurs et des abus. <b>Base légale :</b> notre intérêt légitime (article 6, paragraphe 1, point f), du RGPD). <b>Durée de conservation :</b> une courte durée, conformément aux règles de conservation des données de l’hébergeur.",
+          "Pour les demandes de connexion et de paiement, l’adresse IP est en outre conservée dans la mémoire du serveur pendant 15 minutes au maximum, afin de pouvoir limiter une utilisation excessive.",
         ],
       },
       {
         h: "Cookies et stockage local",
         list: [
           "Cookie NEXT_LOCALE : mémorise la langue que vous avez choisie dans le sélecteur de langue (1 an).",
+          "Cookie {sessionCookie} : vous maintient connecté sur la page « Mes codes » après une connexion par code envoyé par e-mail ; il est signé et ne peut pas être lu par des scripts ({sessionDays} jours ou jusqu’à votre déconnexion).",
+          "Cookie {loginCookie} : la connexion en cours, entre la demande et la saisie du code ({loginMinutes} minutes).",
           "Stockage local (localStorage) : les liens de gestion des codes créés ou ouverts sur cet appareil, afin que vous les retrouviez sur la page « Mes codes ». La page « Mes codes » les utilise pour consulter l’état de vos codes ; pour le reste, ils demeurent dans votre navigateur, et vous pouvez les supprimer à tout moment dans les paramètres de celui-ci.",
           "Le formulaire de paiement est fourni par Stripe, qui utilise ses propres cookies pour traiter le paiement de manière sécurisée et prévenir la fraude.",
         ],
@@ -224,6 +236,7 @@ export const legalFr: LegalTexts = {
           "Hébergement et serveur d’application : {hosting}",
           "Base de données : {database} – les données des codes sont stockées sur un serveur situé dans l’Union européenne (Irlande).",
           "Paiement : {payments} – en qualité de responsable du traitement indépendant.",
+          "Envoi des e-mails de connexion : {emailSender}",
         ],
         after: [
           "Certains de ces prestataires ont leur siège aux États-Unis d’Amérique ; des données peuvent donc également être transférées hors de l’Espace économique européen. Ces transferts s’effectuent moyennant des garanties appropriées (le cadre de protection des données UE–États-Unis [Data Privacy Framework] et/ou les clauses contractuelles types adoptées par la Commission européenne).",
@@ -233,7 +246,7 @@ export const legalFr: LegalTexts = {
       {
         h: "Sécurité des données",
         p: [
-          "Toutes les connexions sont chiffrées (HTTPS). Le jeton de gestion est une valeur aléatoire de 192 bits, les adresses IP ne sont stockées que sous forme d’empreintes salées, et seul l’Exploitant a accès à la base de données.",
+          "Toutes les connexions sont chiffrées (HTTPS). Le jeton de gestion est une valeur aléatoire de 192 bits, les adresses IP ne sont stockées que sous forme d’empreintes salées et les codes de connexion uniquement sous forme d’empreintes à clé (ils expirent au bout de {loginMinutes} minutes et deviennent invalides après {loginAttempts} tentatives erronées). Les cookies de connexion sont signés et ne peuvent pas être lus par des scripts, et seul l’Exploitant a accès à la base de données.",
         ],
       },
       {

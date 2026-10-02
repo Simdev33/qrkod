@@ -39,7 +39,7 @@ export const legalEn: LegalTexts = {
         h: "Conclusion of the contract and the management link",
         p: [
           "The contract is concluded electronically when you create a QR code, and for the paid service when you order a subscription. It is not filed by the Operator and does not refer to any code of conduct.",
-          "There is no registration with a password. Every code has a unique, private management link: anyone who knows it can manage the code (change it, subscribe, cancel the subscription, delete the code). You are responsible for keeping the management link safe and private. If you lose it, the Operator can only help if you can credibly prove that the code is yours, for example with the email address used for the subscription.",
+          "There is no registration with a password. Every code has a unique, private management link: anyone who knows it can manage the code (change it, subscribe, cancel the subscription, delete the code). You are responsible for keeping the management link safe and private. Subscribers can also sign in on the “My codes” page with a single-use code sent to the email address used for the subscription; they then see all the codes paid for with that address, on any device. You are responsible for the security of your email account. If you lose the management link and cannot sign in, the Operator can only help if you can credibly prove that the code is yours.",
         ],
       },
       {
@@ -161,7 +161,7 @@ export const legalEn: LegalTexts = {
       {
         h: "In brief",
         list: [
-          "There is no registration and no password; each code is managed with its private management link.",
+          "There is no registration and no password; each code is managed with its private management link, and subscribers can also sign in with a single-use code sent by email.",
           "We store no personal data about the people who scan your codes – only the number of scans per day.",
           "Payments are processed by Stripe; we do not see or store your card details.",
           "We do not use analytics, advertising or tracking cookies.",
@@ -198,6 +198,15 @@ export const legalEn: LegalTexts = {
         ],
       },
       {
+        h: "Signing in with an email code",
+        p: [
+          "If you have subscribed, you can sign in on the “My codes” page with a single-use code sent to you by email, and see the codes paid for with your email address on any device.",
+          "<b>Data processed:</b> the email address you enter, the sign-in code (stored only as a keyed hash), its expiry time and the number of failed attempts; after signing in, a signed session cookie that contains your email address. To find your codes, we look up the Stripe customers with this email address.",
+          "<b>Purpose:</b> giving subscribers access to their codes. <b>Legal basis:</b> performance of a contract (Article 6(1)(b) GDPR). <b>Retention:</b> the sign-in code for {loginMinutes} minutes (it is deleted as soon as it is used); the session cookie for {sessionDays} days, or until you sign out.",
+          "We send a code only if the address belongs to a subscriber; the page shows the same message either way. Sign-in emails are sent by {emailSender} as a data processor.",
+        ],
+      },
+      {
         h: "Contacting us",
         p: [
           "If you write to us, we use your name, email address and the content of your message to answer you. <b>Legal basis:</b> our legitimate interest in handling enquiries (Article 6(1)(f) GDPR). <b>Retention:</b> for 1 year after the matter is closed.",
@@ -207,12 +216,15 @@ export const legalEn: LegalTexts = {
         h: "Technical logs",
         p: [
           "When the site is served – as with any website – the hosting provider’s servers record technical data: IP address, time of the request, the requested address and the browser type. This also happens when a QR code is scanned. <b>Purpose:</b> the secure and uninterrupted operation of the Service, and the detection of errors and abuse. <b>Legal basis:</b> our legitimate interest (Article 6(1)(f) GDPR). <b>Retention:</b> for a short time, in accordance with the hosting provider’s data retention rules.",
+          "For sign-in and payment requests, the IP address is also kept in the server’s memory for up to 15 minutes, so that excessive use can be limited.",
         ],
       },
       {
         h: "Cookies and local storage",
         list: [
           "NEXT_LOCALE cookie: remembers the language you picked in the language switcher (1 year).",
+          "{sessionCookie} cookie: keeps you signed in on the “My codes” page after you sign in with an email code; it is signed and cannot be read by scripts ({sessionDays} days, or until you sign out).",
+          "{loginCookie} cookie: the sign-in in progress, between requesting and entering the code ({loginMinutes} minutes).",
           "Local storage (localStorage): the management links of the codes created or opened on this device, so that you find them on the “My codes” page. The “My codes” page uses them to look up the status of your codes; otherwise they stay in your browser, and you can delete them at any time in your browser settings.",
           "The payment form is provided by Stripe, which uses its own cookies to process the payment securely and to prevent fraud.",
         ],
@@ -224,6 +236,7 @@ export const legalEn: LegalTexts = {
           "Hosting and application server: {hosting}",
           "Database: {database} – the data of the codes is stored on a server in the European Union (Ireland).",
           "Payments: {payments} – as an independent controller.",
+          "Sending sign-in emails: {emailSender}",
         ],
         after: [
           "Some of these providers are headquartered in the United States of America, so data may also be transferred outside the European Economic Area. Such transfers take place with appropriate safeguards (the EU–US Data Privacy Framework and/or the standard contractual clauses adopted by the European Commission).",
@@ -233,7 +246,7 @@ export const legalEn: LegalTexts = {
       {
         h: "Data security",
         p: [
-          "All connections are encrypted (HTTPS). The management token is a 192-bit random value, IP addresses are stored only as salted hashes, and only the Operator has access to the database.",
+          "All connections are encrypted (HTTPS). The management token is a 192-bit random value, IP addresses are stored only as salted hashes, and sign-in codes only as keyed hashes (they expire after {loginMinutes} minutes and stop working after {loginAttempts} wrong attempts). Sign-in cookies are signed and cannot be read by scripts, and only the Operator has access to the database.",
         ],
       },
       {

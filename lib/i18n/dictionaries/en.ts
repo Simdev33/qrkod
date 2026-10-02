@@ -374,7 +374,7 @@ const en = {
       ],
       email: "Email address",
       emailPlaceholder: "you@example.com",
-      emailHint: "Stripe sends your receipts to this address.",
+      emailHint: "Stripe sends your receipts to this address – and you can sign in with it to find your codes on any device.",
       continue: "Continue to payment",
       change: "Change",
       consent:
@@ -462,6 +462,24 @@ const en = {
     notManageLink: "That’s not a management link. It looks like this: …/manage/Xk2…",
   },
 
+  account: {
+    title: "Your codes on any device",
+    text: "Paid for a code? Sign in with the email address you used at checkout – we’ll send you a 6-digit code.",
+    email: "Email address",
+    send: "Send me a code",
+    sent: "If <b>{email}</b> belongs to a subscriber, we’ve sent a 6-digit code to it. It’s valid for {minutes} minutes.",
+    code: "Sign-in code",
+    verify: "Sign in",
+    resend: "Send a new code",
+    resent: "We’ve sent a new code.",
+    otherEmail: "Use a different email",
+    signedIn: "Signed in as <b>{email}</b>",
+    signedInText: "The codes paid for with this address show up here on any device.",
+    signOut: "Sign out",
+    emptyPrompt: "Already paid for a code?",
+    emptyLink: "Sign in with your email",
+  },
+
   paused: {
     title: "This QR code is paused.",
     text: "Its owner hasn’t renewed it, so we can’t forward you right now. Please try again later, or contact the owner another way.",
@@ -501,6 +519,19 @@ const en = {
     logo_read: "We couldn’t read this image.",
     logo_complex: "The image is too detailed – try a simpler logo.",
     export_failed: "The download failed. Please try again.",
+    invalid_code: "That code isn’t right. Please check it and try again.",
+    code_expired: "This code has expired. Please request a new one.",
+    code_locked: "Too many wrong attempts. Please request a new code.",
+    email_failed: "We couldn’t send the email. Please try again later.",
+    login_unavailable: "Signing in is not available at the moment.",
+    not_signed_in: "Your session has expired. Please sign in again.",
+  },
+
+  email: {
+    subject: "{code} is your {brand} sign-in code",
+    intro: "Here is your code to sign in to {brand}:",
+    validity: "It’s valid for {minutes} minutes. Enter it on the “My codes” page.",
+    ignore: "If you didn’t ask for this code, you can ignore this email – nobody can sign in without it.",
   },
 
   billing: {

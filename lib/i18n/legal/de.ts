@@ -39,7 +39,7 @@ export const legalDe: LegalTexts = {
         h: "Vertragsschluss und Verwaltungslink",
         p: [
           "Der Vertrag kommt auf elektronischem Weg zustande, wenn Sie einen QR-Code erstellen, und für den kostenpflichtigen Dienst, wenn Sie ein Abonnement bestellen. Er wird vom Betreiber nicht archiviert und nimmt auf keinen Verhaltenskodex Bezug.",
-          "Eine Registrierung mit Passwort gibt es nicht. Zu jedem Code gehört ein eindeutiger, privater Verwaltungslink: Wer ihn kennt, kann den Code verwalten (ändern, ein Abonnement abschließen, das Abonnement kündigen, den Code löschen). Sie sind dafür verantwortlich, den Verwaltungslink sicher und vertraulich aufzubewahren. Wenn Sie ihn verlieren, kann der Betreiber nur helfen, wenn Sie glaubhaft nachweisen können, dass der Code Ihnen gehört, zum Beispiel mit der für das Abonnement verwendeten E-Mail-Adresse.",
+          "Eine Registrierung mit Passwort gibt es nicht. Zu jedem Code gehört ein eindeutiger, privater Verwaltungslink: Wer ihn kennt, kann den Code verwalten (ändern, ein Abonnement abschließen, das Abonnement kündigen, den Code löschen). Sie sind dafür verantwortlich, den Verwaltungslink sicher und vertraulich aufzubewahren. Abonnenten können sich auf der Seite „Meine Codes“ außerdem mit einem Einmalcode anmelden, der an die für das Abonnement verwendete E-Mail-Adresse gesendet wird; sie sehen dann auf jedem Gerät alle mit dieser Adresse bezahlten Codes. Für die Sicherheit Ihres E-Mail-Kontos sind Sie selbst verantwortlich. Wenn Sie den Verwaltungslink verlieren und sich auch nicht anmelden können, kann der Betreiber nur helfen, wenn Sie glaubhaft nachweisen können, dass der Code Ihnen gehört.",
         ],
       },
       {
@@ -161,7 +161,7 @@ export const legalDe: LegalTexts = {
       {
         h: "Kurz gesagt",
         list: [
-          "Es gibt keine Registrierung und kein Passwort; jeder Code wird über seinen privaten Verwaltungslink verwaltet.",
+          "Es gibt keine Registrierung und kein Passwort; jeder Code wird über seinen privaten Verwaltungslink verwaltet, und Abonnenten können sich zusätzlich mit einem per E-Mail gesendeten Einmalcode anmelden.",
           "Über die Personen, die Ihre Codes scannen, speichern wir keine personenbezogenen Daten – nur die Anzahl der Scans pro Tag.",
           "Zahlungen werden von Stripe abgewickelt; Ihre Kartendaten sehen und speichern wir nicht.",
           "Wir verwenden keine Analyse-, Werbe- oder Tracking-Cookies.",
@@ -198,6 +198,15 @@ export const legalDe: LegalTexts = {
         ],
       },
       {
+        h: "Anmeldung mit einem E-Mail-Code",
+        p: [
+          "Wenn Sie ein Abonnement abgeschlossen haben, können Sie sich auf der Seite „Meine Codes“ mit einem Einmalcode anmelden, den wir Ihnen per E-Mail senden, und die mit Ihrer E-Mail-Adresse bezahlten Codes auf jedem Gerät sehen.",
+          "<b>Verarbeitete Daten:</b> die von Ihnen eingegebene E-Mail-Adresse, der Anmeldecode (nur als schlüsselbasierter Hashwert gespeichert), seine Ablaufzeit und die Anzahl der Fehlversuche; nach der Anmeldung ein signiertes Sitzungs-Cookie, das Ihre E-Mail-Adresse enthält. Um Ihre Codes zu finden, suchen wir bei Stripe die Kunden mit dieser E-Mail-Adresse.",
+          "<b>Zweck:</b> Abonnenten den Zugriff auf ihre Codes zu ermöglichen. <b>Rechtsgrundlage:</b> Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO). <b>Speicherdauer:</b> der Anmeldecode {loginMinutes} Minuten (er wird gelöscht, sobald er verwendet wurde); das Sitzungs-Cookie {sessionDays} Tage oder bis Sie sich abmelden.",
+          "Wir senden nur dann einen Code, wenn die Adresse zu einem Abonnenten gehört; die Seite zeigt in beiden Fällen dieselbe Meldung. Die Anmelde-E-Mails versendet {emailSender} als Auftragsverarbeiter.",
+        ],
+      },
+      {
         h: "Kontaktaufnahme",
         p: [
           "Wenn Sie uns schreiben, verwenden wir Ihren Namen, Ihre E-Mail-Adresse und den Inhalt Ihrer Nachricht, um Ihnen zu antworten. <b>Rechtsgrundlage:</b> unser berechtigtes Interesse an der Bearbeitung von Anfragen (Art. 6 Abs. 1 lit. f DSGVO). <b>Speicherdauer:</b> 1 Jahr nach Abschluss des Vorgangs.",
@@ -207,12 +216,15 @@ export const legalDe: LegalTexts = {
         h: "Technische Protokolle",
         p: [
           "Beim Ausliefern der Website zeichnen – wie bei jeder Website – die Server des Hosting-Anbieters technische Daten auf: IP-Adresse, Zeitpunkt der Anfrage, die aufgerufene Adresse und den Browsertyp. Das geschieht auch, wenn ein QR-Code gescannt wird. <b>Zweck:</b> der sichere und unterbrechungsfreie Betrieb des Dienstes sowie die Erkennung von Fehlern und Missbrauch. <b>Rechtsgrundlage:</b> unser berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO). <b>Speicherdauer:</b> für kurze Zeit, gemäß den Aufbewahrungsregeln des Hosting-Anbieters.",
+          "Bei Anmelde- und Zahlungsanfragen wird die IP-Adresse außerdem bis zu 15 Minuten im Arbeitsspeicher des Servers vorgehalten, damit eine übermäßige Nutzung begrenzt werden kann.",
         ],
       },
       {
         h: "Cookies und lokale Speicherung",
         list: [
           "NEXT_LOCALE-Cookie: speichert die Sprache, die Sie in der Sprachauswahl gewählt haben (1 Jahr).",
+          "{sessionCookie}-Cookie: hält Sie nach der Anmeldung mit einem E-Mail-Code auf der Seite „Meine Codes“ angemeldet; es ist signiert und für Skripte nicht lesbar ({sessionDays} Tage oder bis Sie sich abmelden).",
+          "{loginCookie}-Cookie: die laufende Anmeldung zwischen der Anforderung und der Eingabe des Codes ({loginMinutes} Minuten).",
           "Lokaler Speicher (localStorage): die Verwaltungslinks der auf diesem Gerät erstellten oder geöffneten Codes, damit Sie sie auf der Seite „Meine Codes“ wiederfinden. Die Seite „Meine Codes“ fragt damit den Status Ihrer Codes ab; ansonsten verbleiben sie in Ihrem Browser, und Sie können sie jederzeit in den Browsereinstellungen löschen.",
           "Das Zahlungsformular wird von Stripe bereitgestellt, das eigene Cookies verwendet, um die Zahlung sicher abzuwickeln und Betrug zu verhindern.",
         ],
@@ -224,6 +236,7 @@ export const legalDe: LegalTexts = {
           "Hosting und Anwendungsserver: {hosting}",
           "Datenbank: {database} – die Daten der Codes werden auf einem Server in der Europäischen Union (Irland) gespeichert.",
           "Zahlungen: {payments} – als eigenständiger Verantwortlicher.",
+          "Versand der Anmelde-E-Mails: {emailSender}",
         ],
         after: [
           "Einige dieser Anbieter haben ihren Sitz in den Vereinigten Staaten von Amerika, sodass Daten auch außerhalb des Europäischen Wirtschaftsraums übermittelt werden können. Solche Übermittlungen erfolgen mit geeigneten Garantien (dem EU-US-Datenschutzrahmen und/oder den von der Europäischen Kommission erlassenen Standardvertragsklauseln).",
@@ -233,7 +246,7 @@ export const legalDe: LegalTexts = {
       {
         h: "Datensicherheit",
         p: [
-          "Alle Verbindungen sind verschlüsselt (HTTPS). Das Verwaltungs-Token ist ein 192-Bit-Zufallswert, IP-Adressen werden nur als gesalzene Hashwerte gespeichert, und nur der Betreiber hat Zugriff auf die Datenbank.",
+          "Alle Verbindungen sind verschlüsselt (HTTPS). Das Verwaltungs-Token ist ein 192-Bit-Zufallswert, IP-Adressen werden nur als gesalzene Hashwerte und Anmeldecodes nur als schlüsselbasierte Hashwerte gespeichert (sie laufen nach {loginMinutes} Minuten ab und werden nach {loginAttempts} Fehlversuchen ungültig). Anmelde-Cookies sind signiert und für Skripte nicht lesbar, und nur der Betreiber hat Zugriff auf die Datenbank.",
         ],
       },
       {

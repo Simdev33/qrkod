@@ -1,26 +1,15 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useState, useSyncExternalStore, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { IconCheck, IconLock, IconShield } from "@/components/ui/Icons";
 import { Rich } from "@/components/ui/Rich";
 import { api, ApiError, errorCode } from "@/lib/api";
 import { useI18n } from "@/lib/i18n/client";
+import { rememberEmail, useRememberedEmail } from "@/lib/remembered-email";
 import { PLAN } from "@/lib/site";
 import type { CodeView, PaymentMode } from "@/lib/types";
 import { StripeCheckout, type Prices } from "./StripeCheckout";
-
-const EMAIL_KEY = "gmqr:email";
-
-const savedEmail = () => {
-  try {
-    return localStorage.getItem(EMAIL_KEY) ?? "";
-  } catch {
-    return "";
-  }
-};
-
-const noSubscription = () => () => {};
 
 type Step = { kind: "email" } | { kind: "pay"; clientSecret: string; email: string };
 
@@ -47,8 +36,8 @@ export function PaymentPanel({
   const { t, l, lang, fill, money, error: errorText } = useI18n();
   const P = t.manage.paywall;
   const [step, setStep] = useState<Step>({ kind: "email" });
-  // The remembered address is read after hydration (the server cannot see it); typing replaces it.
-  const remembered = useSyncExternalStore(noSubscription, savedEmail, () => "");
+  // Typing replaces the address remembered from an earlier payment.
+  const remembered = useRememberedEmail();
   const [typed, setEmail] = useState<string | null>(null);
   const email = typed ?? remembered;
   const [consent, setConsent] = useState(false);
@@ -123,11 +112,7 @@ export function PaymentPanel({
         email: email.trim(),
         lang,
       });
-      try {
-        localStorage.setItem(EMAIL_KEY, email.trim());
-      } catch {
-        // private mode – not needed
-      }
+      rememberEmail(email.trim());
       setStep({ kind: "pay", clientSecret, email: email.trim() });
     } catch (err) {
       setError(errorText(errorCode(err)));

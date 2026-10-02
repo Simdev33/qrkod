@@ -372,7 +372,7 @@ const de: Dictionary = {
       ],
       email: "E-Mail-Adresse",
       emailPlaceholder: "du@beispiel.de",
-      emailHint: "An diese Adresse schickt Stripe deine Belege.",
+      emailHint: "An diese Adresse schickt Stripe deine Belege – und damit kannst du dich auf jedem Gerät anmelden, um deine Codes zu finden.",
       continue: "Weiter zur Zahlung",
       change: "Ändern",
       consent:
@@ -460,6 +460,24 @@ const de: Dictionary = {
     notManageLink: "Das ist kein Verwaltungslink. So sieht einer aus: …/manage/Xk2…",
   },
 
+  account: {
+    title: "Deine Codes auf jedem Gerät",
+    text: "Schon für einen Code bezahlt? Melde dich mit der E-Mail-Adresse an, die du beim Bezahlen angegeben hast – wir schicken dir einen 6-stelligen Code.",
+    email: "E-Mail-Adresse",
+    send: "Code senden",
+    sent: "Falls <b>{email}</b> zu einem Abonnenten gehört, haben wir einen 6-stelligen Code dorthin geschickt. Er ist {minutes} Minuten gültig.",
+    code: "Anmeldecode",
+    verify: "Anmelden",
+    resend: "Neuen Code senden",
+    resent: "Wir haben dir einen neuen Code geschickt.",
+    otherEmail: "Andere E-Mail-Adresse",
+    signedIn: "Angemeldet als <b>{email}</b>",
+    signedInText: "Die mit dieser Adresse bezahlten Codes erscheinen hier auf jedem Gerät.",
+    signOut: "Abmelden",
+    emptyPrompt: "Schon für einen Code bezahlt?",
+    emptyLink: "Mit E-Mail anmelden",
+  },
+
   paused: {
     title: "Dieser QR-Code ist pausiert.",
     text: "Der Inhaber hat ihn nicht verlängert, deshalb können wir dich gerade nicht weiterleiten. Versuch es später noch einmal oder kontaktiere den Inhaber auf anderem Weg.",
@@ -499,6 +517,19 @@ const de: Dictionary = {
     logo_read: "Dieses Bild konnten wir nicht lesen.",
     logo_complex: "Das Bild ist zu detailliert – versuch es mit einem einfacheren Logo.",
     export_failed: "Der Download hat nicht geklappt. Versuch es noch einmal.",
+    invalid_code: "Dieser Code stimmt nicht. Bitte prüfe ihn und versuche es erneut.",
+    code_expired: "Der Code ist abgelaufen. Bitte fordere einen neuen an.",
+    code_locked: "Zu viele falsche Versuche. Bitte fordere einen neuen Code an.",
+    email_failed: "Wir konnten die E-Mail nicht senden. Bitte versuche es später erneut.",
+    login_unavailable: "Die Anmeldung ist gerade nicht verfügbar.",
+    not_signed_in: "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.",
+  },
+
+  email: {
+    subject: "{code} ist dein Anmeldecode für {brand}",
+    intro: "Mit diesem Code meldest du dich bei {brand} an:",
+    validity: "Er ist {minutes} Minuten gültig. Gib ihn auf der Seite „Meine Codes“ ein.",
+    ignore: "Wenn du ihn nicht angefordert hast, kannst du diese E-Mail ignorieren – ohne den Code kann sich niemand anmelden.",
   },
 
   billing: {

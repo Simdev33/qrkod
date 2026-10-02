@@ -374,7 +374,7 @@ const es: Dictionary = {
       ],
       email: "Correo electrónico",
       emailPlaceholder: "tu@ejemplo.com",
-      emailHint: "Stripe enviará tus recibos a esta dirección.",
+      emailHint: "Stripe enviará tus recibos a esta dirección, y con ella podrás iniciar sesión para ver tus códigos en cualquier dispositivo.",
       continue: "Continuar al pago",
       change: "Cambiar",
       consent:
@@ -462,6 +462,24 @@ const es: Dictionary = {
     notManageLink: "Esto no es un enlace de gestión. Tiene este aspecto: …/manage/Xk2…",
   },
 
+  account: {
+    title: "Tus códigos en cualquier dispositivo",
+    text: "¿Ya has pagado un código? Inicia sesión con el correo electrónico que usaste al pagar y te enviaremos un código de 6 dígitos.",
+    email: "Correo electrónico",
+    send: "Enviarme un código",
+    sent: "Si <b>{email}</b> pertenece a un suscriptor, te hemos enviado un código de 6 dígitos. Es válido durante {minutes} minutos.",
+    code: "Código de acceso",
+    verify: "Iniciar sesión",
+    resend: "Enviar un código nuevo",
+    resent: "Te hemos enviado un código nuevo.",
+    otherEmail: "Usar otro correo",
+    signedIn: "Sesión iniciada como <b>{email}</b>",
+    signedInText: "Los códigos pagados con esta dirección aparecen aquí en cualquier dispositivo.",
+    signOut: "Cerrar sesión",
+    emptyPrompt: "¿Ya has pagado un código?",
+    emptyLink: "Iniciar sesión con tu correo",
+  },
+
   paused: {
     title: "Este código QR está en pausa.",
     text: "Su propietario no lo ha renovado, así que ahora mismo no podemos redirigirte. Vuelve a intentarlo más tarde o contacta con el propietario de otra forma.",
@@ -501,6 +519,19 @@ const es: Dictionary = {
     logo_read: "No se ha podido leer esta imagen.",
     logo_complex: "La imagen es demasiado detallada; prueba con un logo más sencillo.",
     export_failed: "La descarga ha fallado. Inténtalo de nuevo.",
+    invalid_code: "Este código no es correcto. Compruébalo e inténtalo de nuevo.",
+    code_expired: "El código ha caducado. Solicita uno nuevo.",
+    code_locked: "Demasiados intentos fallidos. Solicita un código nuevo.",
+    email_failed: "No hemos podido enviar el correo. Inténtalo de nuevo más tarde.",
+    login_unavailable: "El inicio de sesión no está disponible en este momento.",
+    not_signed_in: "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+  },
+
+  email: {
+    subject: "{code} es tu código de acceso a {brand}",
+    intro: "Este es tu código para iniciar sesión en {brand}:",
+    validity: "Es válido durante {minutes} minutos. Introdúcelo en la página «Mis códigos».",
+    ignore: "Si no lo has solicitado, puedes ignorar este correo: nadie puede iniciar sesión sin el código.",
   },
 
   billing: {
