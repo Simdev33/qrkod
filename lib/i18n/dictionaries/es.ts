@@ -4,7 +4,7 @@ const es: Dictionary = {
   meta: {
     title: "Generador de códigos QR dinámicos – cambia el enlace cuando quieras",
     description:
-      "Crea un código QR dinámico y personalizado en segundos. Los primeros {days} días cuestan {intro} y después sigue activo por {monthly} al mes. Y el enlace que hay detrás puedes cambiarlo cuando quieras.",
+      "Crea un código QR dinámico y personalizado en segundos, y cambia el enlace que hay detrás cuando quieras.",
     keywords: [
       "generador de códigos QR",
       "código QR dinámico",
@@ -13,7 +13,7 @@ const es: Dictionary = {
       "seguimiento de códigos QR",
     ],
     ogTitle: "Imprímelo una vez, redirígelo cuando quieras · Generador de códigos QR",
-    ogDescription: "Códigos QR dinámicos: {days} días por {intro}, luego {monthly} al mes. Sin registro.",
+    ogDescription: "Códigos QR dinámicos: imprímelos una vez y redirígelos cuando quieras. Sin registro.",
     manage: "Gestionar código QR",
     myCodes: "Mis códigos",
     terms: "Términos y condiciones",

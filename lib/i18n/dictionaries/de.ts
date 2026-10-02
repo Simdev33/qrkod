@@ -4,10 +4,10 @@ const de: Dictionary = {
   meta: {
     title: "Dynamischer QR-Code-Generator – Link jederzeit änderbar",
     description:
-      "Erstelle in wenigen Sekunden einen individuellen, dynamischen QR-Code. Die ersten {days} Tage kosten {intro}, danach läuft er für {monthly} im Monat weiter – und den Link dahinter kannst du jederzeit ändern.",
+      "Erstelle in wenigen Sekunden einen individuellen, dynamischen QR-Code – und ändere den Link dahinter, wann immer du willst.",
     keywords: ["QR-Code-Generator", "dynamischer QR-Code", "bearbeitbarer QR-Code", "QR-Code mit Logo", "QR-Code-Tracking"],
     ogTitle: "Einmal drucken, jederzeit umleiten · QR-Code-Generator",
-    ogDescription: "Dynamische QR-Codes: {days} Tage für {intro}, danach {monthly} im Monat. Ohne Konto.",
+    ogDescription: "Dynamische QR-Codes: einmal drucken, jederzeit umleiten. Ohne Konto.",
     manage: "QR-Code verwalten",
     myCodes: "Meine Codes",
     terms: "Allgemeine Geschäftsbedingungen",

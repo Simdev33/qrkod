@@ -11,10 +11,10 @@ const en = {
   meta: {
     title: "Dynamic QR code generator – change the link anytime",
     description:
-      "Create a custom, dynamic QR code in seconds. The first {days} days cost {intro}, then it stays live for {monthly} a month – and you can change the link behind it at any time.",
+      "Create a custom, dynamic QR code in seconds – and change the link behind it whenever you like.",
     keywords: ["QR code generator", "dynamic QR code", "editable QR code", "QR code with logo", "QR code tracking"],
     ogTitle: "Print it once, redirect it anytime · QR code generator",
-    ogDescription: "Dynamic QR codes: {days} days for {intro}, then {monthly} a month. No account needed.",
+    ogDescription: "Dynamic QR codes you print once and redirect anytime. No account needed.",
     manage: "Manage QR code",
     myCodes: "My codes",
     terms: "Terms of Service",

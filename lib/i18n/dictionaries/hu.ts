@@ -4,10 +4,10 @@ const hu: Dictionary = {
   meta: {
     title: "Dinamikus QR-kód készítő – a link bármikor átírható",
     description:
-      "Készíts egyedi, dinamikus QR-kódot pár másodperc alatt. Az első {days} nap díja {intro}, utána havi {monthly} díjjal él tovább – a mögötte lévő linket pedig bármikor átírhatod.",
+      "Készíts egyedi, dinamikus QR-kódot pár másodperc alatt – a mögötte lévő linket pedig bármikor átírhatod.",
     keywords: ["QR-kód készítő", "dinamikus QR-kód", "szerkeszthető QR-kód", "QR-kód logóval", "QR-kód statisztika"],
     ogTitle: "Nyomtasd ki egyszer, irányítsd bármikor · QR-kód készítő",
-    ogDescription: "Dinamikus QR-kódok: {days} napig {intro}, utána havi {monthly}. Regisztráció nélkül.",
+    ogDescription: "Dinamikus QR-kódok, amiket egyszer nyomtatsz ki, és bármikor átirányíthatsz. Regisztráció nélkül.",
     manage: "QR-kód kezelése",
     myCodes: "Kódjaim",
     terms: "Általános Szerződési Feltételek",
