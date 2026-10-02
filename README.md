@@ -26,8 +26,8 @@ the real payment form is used (test card 4242 4242 4242 4242).
 2. **Vercel → Settings → Environment Variables:** see [.env.example](.env.example) (`TURSO_DATABASE_URL`,
    `TURSO_AUTH_TOKEN`, `CREATOR_SALT`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`,
    `STRIPE_WEBHOOK_SECRET`, `SESSION_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`).
-3. **Vercel → Settings → Functions → Region:** the region closest to the database (Turso `aws-eu-west-1` →
-   Vercel `dub1`).
+3. **Region:** `vercel.json` runs the functions in `dub1` (Dublin), next to the Turso database (`aws-eu-west-1`).
+   If the database is moved, change it there.
 4. **Stripe → Webhooks (optional):** without it, renewals and endings are read from Stripe when a code’s paid
    period has passed. Endpoint `https://generatemyqrcodes.com/api/stripe/webhook` with the events listed in
    `.env.example`; its signing secret goes into `STRIPE_WEBHOOK_SECRET`.

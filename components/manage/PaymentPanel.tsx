@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconCheck, IconLock, IconShield } from "@/components/ui/Icons";
 import { Rich } from "@/components/ui/Rich";
 import { api, ApiError, errorCode } from "@/lib/api";
@@ -9,13 +9,12 @@ import { useI18n } from "@/lib/i18n/client";
 import { rememberEmail, useRememberedEmail } from "@/lib/remembered-email";
 import { PLAN } from "@/lib/site";
 import type { CodeView, PaymentMode } from "@/lib/types";
-import { StripeCheckout, type Prices } from "./StripeCheckout";
-
-type Step = { kind: "email" } | { kind: "pay"; clientSecret: string; email: string };
+import { looksLikeEmail, StripeCheckout, type Prices } from "./StripeCheckout";
 
 /**
- * Activating (or reactivating) a code: email → our Stripe payment form with the consent box – the same
- * flow as on GetProCV. In developer mode without a Stripe key, a demo button stands in for the payment.
+ * Activating (or reactivating) a code: our Stripe payment form, open as soon as the page loads, with the email
+ * field and the consent box above it – the same as on DoneSignIn. In developer mode without a Stripe key, a demo
+ * button stands in for the payment.
  */
 export function PaymentPanel({
   code,
@@ -35,15 +34,32 @@ export function PaymentPanel({
 }) {
   const { t, l, lang, fill, money, error: errorText } = useI18n();
   const P = t.manage.paywall;
-  const [step, setStep] = useState<Step>({ kind: "email" });
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   // Typing replaces the address remembered from an earlier payment.
   const remembered = useRememberedEmail();
   const [typed, setEmail] = useState<string | null>(null);
   const email = typed ?? remembered;
   const [consent, setConsent] = useState(false);
   const [consentWarning, setConsentWarning] = useState(false);
+  const [emailWarning, setEmailWarning] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const requested = useRef(false);
+  const live = mode === "stripe" && !!stripeKey;
+
+  // The payment form opens with the page: the code's Checkout Session is fetched once (even under StrictMode).
+  // If its last payment was never recorded, the code comes back activated instead.
+  useEffect(() => {
+    if (!live || requested.current) return;
+    requested.current = true;
+    api<{ clientSecret?: string; code?: CodeView }>(`/api/codes/${code.token}/billing`, "POST", { action: "checkout", lang })
+      .then((res) => {
+        if (res.code) onActivated(res.code);
+        else if (res.clientSecret) setClientSecret(res.clientSecret);
+      })
+      .catch((err) => setError(errorText(errorCode(err))));
+  }, [live, code.token, lang, onActivated, errorText]);
 
   const staticPrices: Prices = {
     today: money(firstActivation ? PLAN.introCents : PLAN.monthlyCents),
@@ -102,25 +118,35 @@ export function PaymentPanel({
     </>
   );
 
-  async function startCheckout(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      const { clientSecret } = await api<{ clientSecret: string }>(`/api/codes/${code.token}/billing`, "POST", {
-        action: "checkout",
-        email: email.trim(),
-        lang,
-      });
-      rememberEmail(email.trim());
-      setStep({ kind: "pay", clientSecret, email: email.trim() });
-    } catch (err) {
-      setError(errorText(errorCode(err)));
-    }
-    setBusy(false);
-  }
+  const emailField = (
+    <label className="block space-y-1.5 pt-1">
+      <span className="text-[13px] font-semibold text-ink-2">{P.email}</span>
+      <input
+        ref={emailRef}
+        type="email"
+        autoComplete="email"
+        placeholder={P.emailPlaceholder}
+        value={email}
+        aria-invalid={emailWarning}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          setEmailWarning(false);
+        }}
+        className={`field ${emailWarning ? "!border-coral" : ""}`}
+      />
+      <span className={`block text-xs ${emailWarning ? "font-medium text-coral-deep" : "text-muted"}`}>
+        {emailWarning ? t.errors.invalid_email : P.emailHint}
+      </span>
+    </label>
+  );
+
+  const emailMissing = () => {
+    setEmailWarning(true);
+    emailRef.current?.focus();
+  };
 
   async function paid(sessionId: string) {
+    if (looksLikeEmail(email)) rememberEmail(email.trim());
     try {
       const { code: next } = await api(`/api/codes/${code.token}/billing`, "POST", { action: "complete", sessionId, lang });
       onActivated(next);
@@ -160,59 +186,48 @@ export function PaymentPanel({
       </ul>
 
       <div className="mt-5 space-y-3">
-        {step.kind === "email" && priceRow(staticPrices)}
-
         {mode === "off" || (mode === "stripe" && !stripeKey) ? (
-          <p className="rounded-2xl bg-sun-soft p-4 text-sm text-ink">{P.notConfigured}</p>
+          <>
+            {priceRow(staticPrices)}
+            <p className="rounded-2xl bg-sun-soft p-4 text-sm text-ink">{P.notConfigured}</p>
+          </>
         ) : mode === "demo" ? (
           <>
+            {priceRow(staticPrices)}
             <p className="rounded-2xl border-2 border-dashed border-sun bg-sun-soft p-3.5 text-[13px] leading-relaxed">{P.demo}</p>
             {consentBox}
             <button type="button" className="btn btn-primary w-full py-3.5" disabled={busy} onClick={() => void demoActivate()}>
               {P.demoButton}
             </button>
           </>
-        ) : step.kind === "email" ? (
-          <form onSubmit={startCheckout} className="space-y-3">
-            <label className="block space-y-1.5">
-              <span className="text-[13px] font-semibold text-ink-2">{P.email}</span>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                placeholder={P.emailPlaceholder}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="field"
-              />
-              <span className="block text-xs text-muted">{P.emailHint}</span>
-            </label>
-            <button type="submit" className="btn btn-primary w-full py-3.5" disabled={busy || !email.trim()}>
-              {busy && <span className="inline-block size-4 animate-spin rounded-full border-2 border-current border-r-transparent" />}
-              {P.continue}
-            </button>
-          </form>
-        ) : (
+        ) : clientSecret ? (
           <StripeCheckout
             stripeKey={stripeKey}
-            clientSecret={step.clientSecret}
+            clientSecret={clientSecret}
             consent={consent}
             onConsentMissing={() => setConsentWarning(true)}
+            email={email}
+            onEmailMissing={emailMissing}
             onPaid={(sessionId) => void paid(sessionId)}
             renderPrices={(prices) => (
               <>
                 {priceRow(prices)}
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="truncate text-muted">{step.email}</span>
-                  <button type="button" className="shrink-0 font-semibold text-kobalt hover:underline" onClick={() => setStep({ kind: "email" })}>
-                    {P.change}
-                  </button>
-                </div>
+                {emailField}
                 {consentBox}
                 <p className="pt-1 text-[11px] font-semibold tracking-[0.14em] text-muted uppercase">{P.methods}</p>
               </>
             )}
           />
+        ) : (
+          <>
+            {priceRow(staticPrices)}
+            {!error && (
+              <p className="flex items-center gap-2 py-6 text-sm text-muted">
+                <span className="inline-block size-4 animate-spin rounded-full border-2 border-current border-r-transparent" aria-hidden />
+                {P.loading}
+              </p>
+            )}
+          </>
         )}
 
         {error && <p className="text-sm font-medium text-coral-deep">{error}</p>}

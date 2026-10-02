@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { toView } from "@/lib/server/codes";
+import { toListView } from "@/lib/server/codes";
 import { codesForEmail } from "@/lib/server/login";
 import { clearSession, getSession } from "@/lib/server/session";
 
@@ -8,9 +8,8 @@ export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "not_signed_in" }, { status: 401 });
   try {
-    const now = Date.now();
-    const codes = await Promise.all((await codesForEmail(session.email)).map((row) => toView(row, now)));
-    return NextResponse.json({ email: session.email, codes, now });
+    const codes = (await codesForEmail(session.email)).map(toListView);
+    return NextResponse.json({ email: session.email, codes, now: Date.now() });
   } catch (err) {
     console.error("[account]", err);
     return NextResponse.json({ error: "payment_failed" }, { status: 502 });

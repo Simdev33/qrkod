@@ -1,7 +1,7 @@
 import "server-only";
 import Stripe from "stripe";
 import { applySubscription, getById, getBySubscription, type CodeRow } from "./codes";
-import { one } from "./db";
+import { one, run } from "./db";
 import { paymentMode } from "./mode";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import { fill } from "@/lib/i18n/format";
@@ -110,19 +110,6 @@ function prices() {
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 export const isEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) && email.length <= 254;
 
-/** Our customer with this email address (the newest), or a new one with our tag. */
-async function ensureCustomer(email: string, lang: Locale) {
-  const { data } = await stripe().customers.list({ email: normalizeEmail(email), limit: 20 });
-  const existing = data.filter((customer) => !customer.deleted && ours(customer)).sort((a, b) => b.created - a.created)[0];
-  if (existing) return existing.id;
-  const created = await stripe().customers.create({
-    email: normalizeEmail(email),
-    preferred_locales: [lang],
-    metadata: { app: APP },
-  });
-  return created.id;
-}
-
 /** All of our customers with this email address – the sign-in finds the codes through them. */
 export async function ourCustomerIds(email: string) {
   if (paymentMode() !== "stripe") return [];
@@ -186,20 +173,39 @@ export function missingPaymentEnv() {
 }
 
 /**
- * A Checkout Session for our own payment form. A code activated for the first time gets the
- * introductory days (trial + one-off fee); a reactivated code starts monthly right away.
- * Returns the client secret for the payment form.
+ * The payment form of a code, shown as soon as the page opens (the email is typed into the form, like on
+ * DoneSignIn). The code's open Checkout Session is reused (it stays open for 24 hours); if the last one was paid
+ * but never recorded – the page was closed right after paying, and there is no webhook – it is recorded now.
  */
-export async function createCheckout(row: CodeRow, email: string, origin: string, lang: Locale) {
+export async function openCheckout(row: CodeRow, origin: string, lang: Locale): Promise<{ clientSecret: string } | { completed: true }> {
   if (paymentMode() !== "stripe") throw new Error("payments_off");
-  const [{ intro, monthly }, customer] = await Promise.all([prices(), ensureCustomer(email, lang)]);
+  if (row.checkout_id) {
+    const session = await stripe()
+      .checkout.sessions.retrieve(row.checkout_id, { expand: ["subscription"] })
+      .catch(() => null);
+    if (session && ours(session) && session.metadata?.code === row.id) {
+      if (session.status === "complete" && (await recordCheckout(session, row))) return { completed: true };
+      if (session.status === "open" && session.client_secret && session.metadata?.locale === lang) {
+        return { clientSecret: session.client_secret };
+      }
+    }
+  }
+  return { clientSecret: await createCheckout(row, origin, lang) };
+}
+
+/**
+ * A new Checkout Session. A code activated for the first time gets the introductory days (trial + one-off fee);
+ * a reactivated code starts monthly right away. Stripe creates the customer when paying; it is tagged as ours
+ * afterwards (recordCheckout), so the sign-in finds it.
+ */
+async function createCheckout(row: CodeRow, origin: string, lang: Locale) {
+  const { intro, monthly } = await prices();
   const firstActivation = row.paid_until == null;
   const back = `${origin}${localePath(lang, `/manage/${row.token}`)}`;
 
   const session = await stripe().checkout.sessions.create({
     ui_mode: "elements",
     mode: "subscription",
-    customer,
     client_reference_id: row.id,
     line_items: firstActivation
       ? [
@@ -218,7 +224,24 @@ export async function createCheckout(row: CodeRow, email: string, origin: string
     metadata: { app: APP, code: row.id, locale: lang },
   });
   if (!session.client_secret) throw new Error("payment_failed");
+  await run("UPDATE codes SET checkout_id = ? WHERE id = ?", [session.id, row.id]);
   return session.client_secret;
+}
+
+/** A completed Checkout Session: the subscription goes onto the code, and the customer Stripe created is tagged as ours. */
+async function recordCheckout(session: Stripe.Checkout.Session, row: CodeRow) {
+  const sub = session.subscription;
+  if (!sub || typeof sub === "string") return false;
+  await sync(sub, row.id);
+  const customer = typeof session.customer === "string" ? session.customer : session.customer?.id;
+  if (customer) {
+    const locale = session.metadata?.locale;
+    await stripe()
+      .customers.update(customer, { metadata: { app: APP }, ...(locale ? { preferred_locales: [locale] } : {}) })
+      .catch((error) => console.error("[billing] tag customer", customer, error));
+  }
+  await run("UPDATE codes SET checkout_id = NULL WHERE id = ? AND checkout_id = ?", [row.id, session.id]);
+  return true;
 }
 
 /**
@@ -229,10 +252,7 @@ export async function completeCheckout(sessionId: string, row: CodeRow) {
   if (paymentMode() !== "stripe" || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return false;
   const session = await stripe().checkout.sessions.retrieve(sessionId, { expand: ["subscription"] });
   if (session.status !== "complete" || !ours(session) || session.metadata?.code !== row.id) return false;
-  const sub = session.subscription;
-  if (!sub || typeof sub === "string") return false;
-  await sync(sub, row.id);
-  return true;
+  return recordCheckout(session, row);
 }
 
 /** Cancel at the end of the paid period (cancel = true), or withdraw the cancellation. */
@@ -317,9 +337,9 @@ export async function handleEvent(event: Stripe.Event) {
     case "checkout.session.completed": {
       const session = event.data.object;
       if (!ours(session)) return;
-      const subId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
-      if (!subId) return;
-      await sync(await stripe().subscriptions.retrieve(subId), session.metadata?.code);
+      const row = session.metadata?.code ? await getById(session.metadata.code) : null;
+      if (!row) return;
+      await recordCheckout(await stripe().checkout.sessions.retrieve(session.id, { expand: ["subscription"] }), row);
       return;
     }
     case "customer.subscription.created":

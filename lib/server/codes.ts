@@ -27,6 +27,7 @@ export type CodeRow = {
   missed_scans: number;
   last_scan_at: number | null;
   creator: string | null;
+  checkout_id: string | null;
 };
 
 const TITLE_MAX = 60;
@@ -69,6 +70,13 @@ export async function getById(id: string, now = Date.now()): Promise<CodeRow | n
   return row ? refresh(row, now) : null;
 }
 
+/** Several codes in one query (the “My codes” list). */
+export async function getByTokens(tokens: string[], now = Date.now()): Promise<CodeRow[]> {
+  if (!tokens.length) return [];
+  const rows = await all<CodeRow>(`SELECT * FROM codes WHERE token IN (${tokens.map(() => "?").join(", ")})`, tokens);
+  return Promise.all(rows.map((row) => refresh(row, now)));
+}
+
 export function getBySubscription(subId: string): Promise<CodeRow | null> {
   return one<CodeRow>("SELECT * FROM codes WHERE sub_id = ?", [subId]);
 }
@@ -93,6 +101,11 @@ export async function toView(row: CodeRow, now = Date.now()): Promise<CodeView> 
     [row.id, days[0]],
   );
   const byDay = new Map(counts.map((c) => [c.day, c.count]));
+  return { ...toListView(row), daily: days.map((day) => ({ day, count: byDay.get(day) ?? 0 })) };
+}
+
+/** For lists (“My codes”): without the daily statistics, so there is no extra query per code. */
+export function toListView(row: CodeRow): CodeView {
   return {
     id: row.id,
     token: row.token,
@@ -104,7 +117,7 @@ export async function toView(row: CodeRow, now = Date.now()): Promise<CodeView> 
     scans: row.scans,
     missedScans: row.missed_scans,
     lastScanAt: row.last_scan_at,
-    daily: days.map((day) => ({ day, count: byDay.get(day) ?? 0 })),
+    daily: [],
   };
 }
 

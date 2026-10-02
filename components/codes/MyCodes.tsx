@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { QrCode } from "@/components/qr/QrCode";
 import { IconArrowRight, IconPlus, IconScan } from "@/components/ui/Icons";
 import { api, errorCode } from "@/lib/api";
@@ -10,11 +10,11 @@ import { prettyUrl } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/client";
 import { TOKEN_RE } from "@/lib/ids";
 import { forgetCode, onLocalCodesChange, readLocalCodes, rememberCode } from "@/lib/local-codes";
-import { focusSignIn, SIGN_IN_ID, SignedInBar, SignInCard } from "./Account";
 import { lifeStatus, type Phase } from "@/lib/status";
 import type { CodeView } from "@/lib/types";
+import { focusSignIn, SIGN_IN_ID, SignedInBar, SignInCard } from "./Account";
 
-type State = { loading: true } | { loading: false; codes: CodeView[]; now: number };
+type State = { loading: true } | { loading: false; codes: CodeView[]; now: number; failed?: boolean };
 type Loaded = { codes: CodeView[]; now: number; signedOut: boolean };
 
 const TONE: Record<Phase, string> = {
@@ -25,6 +25,41 @@ const TONE: Record<Phase, string> = {
   canceling: "bg-sun text-ink",
   expired: "bg-coral text-white",
 };
+
+// The last loaded list is kept in the browser: on the next visit the cards appear at once, and the fresh
+// state replaces them as soon as it arrives.
+const CACHE_KEY = "gmqr:my-codes";
+type Cache = { codes: CodeView[]; now: number; account: string | null };
+
+const readCache = () => {
+  try {
+    return localStorage.getItem(CACHE_KEY);
+  } catch {
+    return null;
+  }
+};
+const noSubscription = () => () => {};
+
+function cachedList(raw: string | null, account: string | null) {
+  if (!raw) return null;
+  try {
+    const cache = JSON.parse(raw) as Cache;
+    // Only codes this device still remembers, or the signed-in account's own codes.
+    const local = new Set(readLocalCodes().map((c) => c.token));
+    const codes = cache.codes.filter((c) => local.has(c.token) || (account !== null && cache.account === account));
+    return codes.length ? { codes, now: cache.now } : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveCache(cache: Cache) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // full or blocked storage: the list just loads without it next time
+  }
+}
 
 /** The codes remembered on this device, plus – when signed in – the ones paid for with the account’s email. */
 async function load(account: string | null): Promise<Loaded> {
@@ -67,6 +102,11 @@ export function MyCodes({
   const [state, setState] = useState<State>({ loading: true });
   const [version, setVersion] = useState(0);
   const [account, setAccount] = useState(initialAccount);
+  // Read after hydration (the server has no browser storage), so both renders match.
+  const cacheRaw = useSyncExternalStore(noSubscription, readCache, () => null);
+  const cached = useMemo(() => cachedList(cacheRaw, account), [cacheRaw, account]);
+  // Until the fresh list arrives – or if it couldn't be loaded – the stored one is shown.
+  const list = state.loading ? cached : state.failed ? (cached ?? state) : state;
 
   useEffect(() => onLocalCodesChange(() => setVersion((v) => v + 1)), []);
 
@@ -76,9 +116,10 @@ export function MyCodes({
       .then((res) => {
         if (cancelled) return;
         setState({ loading: false, codes: res.codes, now: res.now });
+        saveCache({ codes: res.codes, now: res.now, account: res.signedOut ? null : account });
         if (res.signedOut) setAccount(null);
       })
-      .catch(() => !cancelled && setState({ loading: false, codes: [], now: Date.now() }));
+      .catch(() => !cancelled && setState({ loading: false, codes: [], now: Date.now(), failed: true }));
     return () => {
       cancelled = true;
     };
@@ -120,18 +161,18 @@ export function MyCodes({
       </AnimatePresence>
 
       <div className="mt-10">
-        {state.loading ? (
+        {!list ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <div key={i} className="card h-[188px] animate-pulse bg-card/60" />
             ))}
           </div>
-        ) : state.codes.length === 0 ? (
+        ) : list.codes.length === 0 ? (
           <Empty signIn={showSignIn} />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {state.codes.map((c, i) => (
-              <CodeCard key={c.token} code={c} now={state.now} origin={origin} index={i} />
+            {list.codes.map((c, i) => (
+              <CodeCard key={c.token} code={c} now={list.now} origin={origin} index={i} />
             ))}
           </div>
         )}

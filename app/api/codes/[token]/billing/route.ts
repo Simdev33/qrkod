@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { TOKEN_RE } from "@/lib/ids";
-import { completeCheckout, createCheckout, isEmail, normalizeEmail, portalUrl, setCancelAtPeriodEnd } from "@/lib/server/billing";
+import { completeCheckout, openCheckout, portalUrl, setCancelAtPeriodEnd } from "@/lib/server/billing";
 import { getByToken, toView } from "@/lib/server/codes";
 import { limited } from "@/lib/server/rate-limit";
 import { clientIp, originOf } from "@/lib/server/request";
@@ -20,15 +20,16 @@ export async function POST(req: Request, ctx: RouteContext<"/api/codes/[token]/b
 
   try {
     switch (body.action) {
-      // The payment form: a Checkout Session for this code (email first, like the other TourCierge sites).
+      // The payment form, opened with the page: the code's Checkout Session (the email is typed into the form).
+      // If its last payment was never recorded, it is recorded now and the activated code comes back instead.
       case "checkout": {
         if (isSubscribed(row.sub_status)) return NextResponse.json({ error: "already_subscribed" }, { status: 409 });
-        const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
-        if (!isEmail(email)) return NextResponse.json({ error: "invalid_email" }, { status: 400 });
-        if (limited(`checkout:${clientIp(req)}`, 20, 15 * 60_000)) {
+        if (limited(`checkout:${clientIp(req)}`, 30, 15 * 60_000)) {
           return NextResponse.json({ error: "rate_limited" }, { status: 429 });
         }
-        return NextResponse.json({ clientSecret: await createCheckout(row, email, origin, lang) });
+        const result = await openCheckout(row, origin, lang);
+        if ("completed" in result) return NextResponse.json({ code: await toView((await getByToken(token))!) });
+        return NextResponse.json({ clientSecret: result.clientSecret });
       }
       // After a successful payment: the subscription is written onto the code right away (the webhook also does it).
       case "complete": {

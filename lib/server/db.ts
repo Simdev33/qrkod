@@ -42,7 +42,11 @@ const TABLES = [
 ];
 
 /** Később hozzáadott oszlopok: a régebbi adatbázisokba ALTER TABLE-lel kerülnek be. */
-const ADDED_COLUMNS: [table: string, column: string, type: string][] = [["codes", "creator", "TEXT"]];
+const ADDED_COLUMNS: [table: string, column: string, type: string][] = [
+  ["codes", "creator", "TEXT"],
+  // The last Checkout Session of the code: reused while open, and recorded if it was paid but never completed.
+  ["codes", "checkout_id", "TEXT"],
+];
 
 const INDEXES = [
   "CREATE INDEX IF NOT EXISTS codes_sub ON codes(sub_id)",
@@ -61,14 +65,26 @@ function connect(): Client {
   return createClient({ url: `file:${path.join(dir, "kockakod.db").replace(/\\/g, "/")}` });
 }
 
+/**
+ * Bump whenever TABLES, ADDED_COLUMNS or INDEXES change. A database already at this version skips the
+ * schema checks, so a cold start costs one query instead of several round trips to Turso.
+ */
+const SCHEMA_VERSION = 2;
+
 async function init(): Promise<Client> {
   const client = connect();
+  const version = await client
+    .execute("PRAGMA user_version")
+    .then((rs) => Number(rs.rows[0]?.[0] ?? 0))
+    .catch(() => 0);
+  if (version >= SCHEMA_VERSION) return client;
   await client.batch(TABLES, "write");
   for (const [table, column, type] of ADDED_COLUMNS) {
     const info = await client.execute(`PRAGMA table_info(${table})`);
     if (!info.rows.some((r) => r.name === column)) await client.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
   }
   await client.batch(INDEXES, "write");
+  await client.execute(`PRAGMA user_version = ${SCHEMA_VERSION}`).catch(() => undefined);
   return client;
 }
 
